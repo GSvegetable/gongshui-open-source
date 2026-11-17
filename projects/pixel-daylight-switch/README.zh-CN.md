@@ -221,8 +221,8 @@ root.addEventListener('daylight:change', (event) => {
 ## 开发与测试
 
 ```bash
-git clone https://github.com/GSvegetable/gongshui-open-source/tree/main/projects/pixel-daylight-switch.git
-cd 1_pixel-daylight-switch
+git clone https://github.com/GSvegetable/gongshui-open-source.git
+cd gongshui-open-source/projects/pixel-daylight-switch
 npm test
 ```
 
