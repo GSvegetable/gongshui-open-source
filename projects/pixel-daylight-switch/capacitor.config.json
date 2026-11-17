@@ -1,0 +1,15 @@
+{
+  "appId": "com.gsvegetable.pixeldayswitch",
+  "appName": "Pixel Daylight Switch",
+  "webDir": "mobile/www",
+  "backgroundColor": "#eef1f5",
+  "ios": {
+    "contentInset": "automatic",
+    "preferredContentMode": "mobile"
+  },
+  "android": {
+    "backgroundColor": "#eef1f5",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}

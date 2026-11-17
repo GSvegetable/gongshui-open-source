@@ -1,0 +1,117 @@
+# Pixel Daylight Switch
+
+> A dependency-free, draggable pixel-art day/night UI component. Five living pixel-art environments sit inside a refractive glass lens, with continuous day-to-night color, lighting and animation transitions.
+
+## Zero-setup browser embed
+
+Paste one line where the component should appear:
+
+```html
+<script src="https://gsvegetable.github.io/1_pixel-daylight-switch/embed.js"></script>
+```
+
+The loader creates a responsive instance and loads the runtime. Component styles are scoped; the loader does not inject the demo stylesheet or reset the host page's body, main, footer, typography or layout. Set supported `data-*` options (including `data-scene` and `data-weather`) on the script tag to configure this instance. Use the mount API for multiple instances or custom placement.
+
+## Direct browser usage
+
+```html
+<div style="width:min(100%, 800px);margin-inline:auto">
+  <div data-ld-part="toggle-daylight" data-scene="japanese-street"></div>
+</div>
+<script src="https://gsvegetable.github.io/1_pixel-daylight-switch/app.js"></script>
+```
+
+No stylesheet import is required. The runtime injects component-scoped CSS and automatically mounts matching elements. The host/container must have a measurable width. The component preserves its 1.6439 aspect ratio and scales to its available width.
+
+## npm
+
+```bash
+npm install pixel-daylight-switch-gsvegetable
+```
+
+```js
+import PixelDaylightSwitch, { mount, unmount } from 'pixel-daylight-switch-gsvegetable';
+
+const root = document.querySelector('[data-ld-part="toggle-daylight"]');
+mount(root);
+// Before removing the root:
+unmount(root);
+```
+
+CommonJS: `const PixelDaylightSwitch = require('pixel-daylight-switch-gsvegetable')`.
+
+The package is safe to import during SSR; mount only after the target DOM element exists. `mount(element)` is idempotent and returns a cleanup function on success (or null on failure). `unmount(element)` stops rendering and removes observers/listeners; it does not remove the DOM root or forcibly invalidate the canvas context.
+
+Framework lifecycle examples are in [INTEGRATIONS.md](docs/INTEGRATIONS.md). Scene plugin authoring, manifest constraints and API examples are in [SCENE_PLUGINS.md](docs/SCENE_PLUGINS.md).
+
+## Standalone refractive glass engine (v3.1.1)
+
+Import `createGlass` from `pixel-daylight-switch-gsvegetable/glass-engine`, or load `glass-engine.js` directly and use `PixelGlassEngine.createGlass(container, options)`. The independent WebGL2 overlay has configurable width, height, position, radius, refraction, dispersion, bezel, shine, opacity, source and lifecycle methods. Sources are origin-clean canvas, image, video, ImageBitmap or a callback returning one. WebGL cannot sample arbitrary DOM pixels; host applications must supply a renderable background source. See [GLASS_ENGINE.md](docs/GLASS_ENGINE.md) and [the demo](https://gsvegetable.github.io/1_pixel-daylight-switch/demos/glass-engine.html).
+
+## Community scene plugins (current: Manifest v2)
+
+The optional `scene-plugin.js` registry exposes `registerScene(manifest)`, `validateScene(manifest)`, `getScene(id)` and `listScenes()`. Register a data-only JSON manifest before mounting the scene. Manifest v2 supports up to 24 reusable pixel-matrix assets, up to 16 ordered layers, transparent overlay pixels (.), and bounded deterministic drift/bob motion tracks. Manifest v1 remains supported and its schema is unchanged. Every symbol in the base matrix and assets must be defined in each palette. Registration validates, copies and freezes the data; arbitrary JavaScript, remote image downloads and executable callbacks are not run.
+
+For npm, import `registerScene` from the package. In a browser, load `scene-plugin.js` before `app.js` and register the manifest before mounting. See [the scene authoring guide](docs/SCENE_PLUGINS.md), [Manifest v2 Schema](schemas/scene-manifest.v2.schema.json), [v1 compatibility schema](schemas/scene-manifest.v1.schema.json) and [Floating Island v2 example](examples/scenes/floating-island.v2.json).
+
+## Scenes and weather
+
+| Attribute | Default | Accepted values |
+| --- | --- | --- |
+| `data-scene` | `countryside` | `countryside`, `japanese-street`, `apartment`, `seaside`, `mountain-cabin` |
+| `data-weather` | `default` | `default`, `snow` |
+| `data-start-night` | `false` | `true`, `false` |
+
+All five scenes are authored environments, not static background images. They use time-of-day palette keys and scene-specific lighting/animation: for example, the seaside lighthouse sweeps a beam across the bay, the apartment changes window and room lighting and animates its cat/resident, and the mountain cabin includes snow/pines and aurora behavior. Scene details continue to evolve as the clock moves between dawn, day, dusk and night.
+
+## Visual and motion parameters
+
+| Attribute | Default | Accepted values / range |
+| --- | --- | --- |
+| `data-speed` | `9.5` | Positive number |
+| `data-refraction` | `1.24` | Positive number |
+| `data-bezel` | `0.046` | Positive number |
+| `data-friction` | `0.6` | `0.1–0.9` |
+| `data-bounce` | `3.2` | `0–12` |
+| `data-dispersion` | `0.05` | `0–0.25` |
+| `data-shine` | `0.44` | `0–1.5` |
+| `data-time-speed` | `1` | `0–8`; zero freezes world time |
+
+Invalid values fall back to defaults; documented numeric ranges are clamped.
+
+## JavaScript API and events
+
+- `mount(element)`: mount one root; idempotent.
+- `unmount(element)`: stop rendering and clean up observers and event listeners.
+- The runtime auto-mounts existing `[data-ld-part="toggle-daylight"]` elements.
+- Use `mount(element)` for elements created later.
+- Listen for `daylight:change` on the root. `event.detail.night` is a boolean and the event fires when the committed day/night state changes, not every animation frame.
+- The root exposes transition progress through CSS custom property `--night` (0 day, 1 night).
+
+## Rendering, accessibility and performance
+
+- WebGL2 renders the refractive glass; Canvas 2D is the fallback.
+- Keyboard interaction, switch semantics, accessible labels and live status are provided.
+- Respects `prefers-reduced-motion`.
+- Rendering pauses while the page is hidden or the component is outside the viewport.
+- Multiple independent instances are supported.
+
+## Links
+
+- [Live demo](https://gsvegetable.github.io/1_pixel-daylight-switch/)
+- [Interactive Playground](https://gsvegetable.github.io/1_pixel-daylight-switch/demos/playground.html)
+- [Preview](https://gsvegetable.github.io/1_pixel-daylight-switch/demos/preview.html)
+- [Integration recipes](docs/INTEGRATIONS.md)
+- [English README](README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
+- [Changelog](docs/CHANGELOG.md)
+
+
+## Scene plugins — current Manifest v2
+
+- Current schema: `schemas/scene-manifest.v2.schema.json`.
+- Example: `examples/scenes/floating-island.v2.json`.
+- Reusable assets: up to 24 pixel matrices; ordered layers: up to 16.
+- Overlay dot (.) is transparent; later layers appear above earlier layers.
+- Motion tracks: bounded deterministic `drift` and `bob`, on x or y.
+- Manifest v1 remains backward compatible; its schema is retained.
+- No arbitrary remote image loading, eval, or executable plugin callbacks.

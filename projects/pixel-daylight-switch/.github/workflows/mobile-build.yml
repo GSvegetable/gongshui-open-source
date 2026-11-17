@@ -1,0 +1,195 @@
+name: Native mobile builds
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'app.js'
+      - 'style.css'
+      - 'mobile/**'
+      - 'scripts/**'
+      - 'capacitor.config.json'
+      - 'package.json'
+      - 'tests/mobile-smoke.cjs'
+      - 'docs/CHANGELOG.md'
+      - 'README*.md'
+      - '.github/workflows/mobile-build.yml'
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Android debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install Android SDK packages
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          test -n "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Install dependencies and prepare app
+        run: |
+          npm install
+          npm run mobile:prepare
+          npx cap add android
+          npx cap sync android
+          node scripts/set-android-version.cjs android/app/build.gradle
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixel-daylight-switch-android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  ios:
+    name: iOS Simulator build
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies and prepare app
+        run: |
+          npm install
+          npm run mobile:prepare
+          npx cap add ios
+          npx cap sync ios
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath build/ios-derived \
+            build
+      - name: Package iOS Simulator app
+        run: |
+          mkdir -p dist/ios
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/ios-derived/Build/Products/Debug-iphonesimulator/App.app \
+            dist/ios/pixel-daylight-switch-ios-simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixel-daylight-switch-ios-simulator
+          path: dist/ios/pixel-daylight-switch-ios-simulator.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-builds:
+    name: Publish latest mobile builds to repository
+    needs: [android, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: pixel-daylight-switch-android-debug
+          path: dist/android
+      - uses: actions/download-artifact@v4
+        with:
+          name: pixel-daylight-switch-ios-simulator
+          path: dist/ios
+      - name: Publish stable build files
+        run: |
+          mkdir -p builds/android builds/ios
+          cp dist/android/app-debug.apk builds/android/pixel-daylight-switch-debug.apk
+          cp dist/ios/pixel-daylight-switch-ios-simulator.zip builds/ios/pixel-daylight-switch-ios-simulator.zip
+          cat > builds/README.md <<'EOF'
+          # Mobile builds
+
+          The files below are the latest successful builds produced by GitHub Actions.
+
+          - **[Download Android APK](android/pixel-daylight-switch-debug.apk)** — install directly on an Android device. This is a debug build, not a Play Store release.
+          - **[Download iOS Simulator app](ios/pixel-daylight-switch-ios-simulator.zip)** — unsigned simulator app bundle. It cannot be installed on a physical iPhone or iPad.
+
+          Both files are regenerated after the Android and iOS build jobs succeed. The Android build is also checked on an emulator before the workflow finishes.
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add builds/README.md
+          git add -f builds/android/pixel-daylight-switch-debug.apk builds/ios/pixel-daylight-switch-ios-simulator.zip
+          if git diff --cached --quiet; then
+            echo "No build changes to publish"
+          else
+            git commit -m "build: publish latest Android and iOS simulator builds"
+            git push origin HEAD:main
+          fi
+
+  android-runtime:
+    name: Android emulator runtime smoke test
+    needs: android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download debug APK
+        uses: actions/download-artifact@v4
+        with:
+          name: pixel-daylight-switch-android-debug
+          path: artifacts
+      - name: Boot emulator and verify rendered app
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_tablet
+          script: |
+            python3 -m pip install --quiet pillow
+            adb install artifacts/app-debug.apk
+            adb logcat -c
+            adb shell monkey -p com.gsvegetable.pixeldayswitch 1
+            sleep 12
+            adb shell screencap -p /data/local/tmp/pixel-daylight-switch.png
+            adb pull /data/local/tmp/pixel-daylight-switch.png pixel-daylight-switch.png
+            adb logcat -d > android-logcat.txt
+            python3 - <<'PY'
+            from PIL import Image
+            image = Image.open("pixel-daylight-switch.png").convert("RGB")
+            width, height = image.size
+            # Ignore Android status/navigation bars and inspect the central app surface.
+            crop = image.crop((int(width * .08), int(height * .12), int(width * .92), int(height * .88)))
+            colors = crop.getcolors(maxcolors=crop.width * crop.height)
+            unique = len(colors) if colors else 1000000
+            if unique < 80:
+                raise SystemExit(f"Rendered app appears blank: only {unique} colors in central screen")
+            print(f"Android runtime screenshot: {width}x{height}, {unique} central colors")
+            PY
+            if grep -E "\\[pixel-daylight-switch\\]|Uncaught (Error|TypeError|ReferenceError)" android-logcat.txt; then
+              echo "JavaScript runtime error detected in Android WebView"
+              exit 1
+            fi
+      - name: Upload Android runtime diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pixel-daylight-switch-android-runtime-diagnostics
+          path: |
+            pixel-daylight-switch.png
+            android-logcat.txt
+          if-no-files-found: ignore
+          retention-days: 14

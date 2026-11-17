@@ -1,0 +1,104 @@
+{
+  "name": "pixel-daylight-switch-gsvegetable",
+  "version": "3.1.1",
+  "description": "A pixel-art day/night switch plus a standalone reusable WebGL2 refractive glass engine.",
+  "keywords": [
+    "pixel-art",
+    "day-night",
+    "toggle",
+    "switch",
+    "canvas",
+    "webgl",
+    "ui-component",
+    "vanilla-js",
+    "capacitor",
+    "android",
+    "ios",
+    "scene-plugin",
+    "pixel-world",
+    "scene-manifest",
+    "pixel-art-scenes",
+    "refractive-glass",
+    "glass-engine",
+    "webgl2-glass",
+    "lens-shader"
+  ],
+  "author": "GSvegetable",
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GSvegetable/1_pixel-daylight-switch.git"
+  },
+  "homepage": "https://github.com/GSvegetable/1_pixel-daylight-switch#readme",
+  "bugs": {
+    "url": "https://github.com/GSvegetable/1_pixel-daylight-switch/issues"
+  },
+  "main": "./index.cjs",
+  "module": "./index.mjs",
+  "browser": "./browser.mjs",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "browser": "./browser.mjs",
+      "import": "./index.mjs",
+      "require": "./index.cjs"
+    },
+    "./app.js": "./app.js",
+    "./package.json": "./package.json",
+    "./scene-plugin": {
+      "import": "./scene-plugin.js",
+      "require": "./scene-plugin.js"
+    },
+    "./glass-engine": {
+      "types": "./index.d.ts",
+      "import": "./glass-engine.mjs",
+      "require": "./glass-engine.js"
+    }
+  },
+  "files": [
+    "app.js",
+    "index.cjs",
+    "index.mjs",
+    "README.md",
+    "LICENSE",
+    "llms.txt",
+    "docs/INTEGRATIONS.md",
+    "docs/SCENE_PLUGINS.md",
+    "scene-plugin.js",
+    "schemas",
+    "examples",
+    "browser.mjs",
+    "index.d.ts",
+    "docs/CHANGELOG.md",
+    "glass-engine.js",
+    "docs/GLASS_ENGINE.md",
+    "glass-engine.mjs"
+  ],
+  "sideEffects": [
+    "./app.js"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node tests/package-smoke.cjs && node tests/scene-plugin-smoke.cjs && node tests/mobile-smoke.cjs && node tests/embed-smoke.cjs && node tests/glass-engine-smoke.cjs",
+    "test:browser": "playwright test --config config/playwright.config.cjs",
+    "mobile:prepare": "node scripts/prepare-mobile.cjs",
+    "mobile:android": "npm run mobile:prepare && cap sync android && node scripts/set-android-version.cjs android/app/build.gradle",
+    "mobile:ios": "npm run mobile:prepare && cap sync ios",
+    "mobile:android:init": "npm run mobile:prepare && cap add android && node scripts/set-android-version.cjs android/app/build.gradle",
+    "mobile:ios:init": "npm run mobile:prepare && cap add ios",
+    "mobile:open:android": "cap open android",
+    "mobile:open:ios": "cap open ios"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/android": "8.6.0",
+    "@capacitor/ios": "8.6.0"
+  },
+  "types": "./index.d.ts"
+}
