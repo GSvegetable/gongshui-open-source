@@ -27,11 +27,12 @@
   "license": "Unlicense",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GSvegetable/1_pixel-daylight-switch.git"
+    "url": "https://github.com/GSvegetable/gongshui-open-source.git",
+    "directory": "projects/pixel-daylight-switch"
   },
-  "homepage": "https://github.com/GSvegetable/1_pixel-daylight-switch#readme",
+  "homepage": "https://github.com/GSvegetable/gongshui-open-source/tree/main/projects/pixel-daylight-switch#readme",
   "bugs": {
-    "url": "https://github.com/GSvegetable/1_pixel-daylight-switch/issues"
+    "url": "https://github.com/GSvegetable/gongshui-open-source/issues"
   },
   "main": "./index.cjs",
   "module": "./index.mjs",
