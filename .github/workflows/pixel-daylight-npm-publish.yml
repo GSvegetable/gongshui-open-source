@@ -1,0 +1,45 @@
+name: Publish Pixel Daylight Switch to npm
+
+on:
+  push:
+    tags:
+      - "pixel-daylight-v*"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        working-directory: projects/pixel-daylight-switch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Verify tag matches package version
+        shell: bash
+        run: |
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          TAG_VERSION="${GITHUB_REF_NAME#pixel-daylight-v}"
+          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+            echo "Tag pixel-daylight-v$TAG_VERSION does not match package.json version $PACKAGE_VERSION"
+            exit 1
+          fi
+      - name: Run package smoke tests
+        run: npm test
+      - name: Install browser test runner
+        run: npm install --no-save @playwright/test@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser stress tests
+        run: npm run test:browser
+      - name: Inspect publish contents
+        run: npm pack --dry-run
+      - name: Publish package
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
