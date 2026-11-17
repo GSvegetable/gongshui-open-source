@@ -1,0 +1,45 @@
+name: Import project repositories
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-projects.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-projects
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out monorepo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Import Pixel Daylight Switch with full history
+        run: |
+          git remote add pixel-daylight https://github.com/GSvegetable/1_pixel-daylight-switch.git
+          git fetch pixel-daylight main
+          git subtree add --prefix=projects/pixel-daylight-switch pixel-daylight main
+
+      - name: Import Pixel Orbit with full history
+        run: |
+          git remote add pixel-orbit https://github.com/GSvegetable/2_pixel-dusk.git
+          git fetch pixel-orbit main
+          git subtree add --prefix=projects/pixel-orbit pixel-orbit main
+
+      - name: Push imported projects
+        run: git push origin main
