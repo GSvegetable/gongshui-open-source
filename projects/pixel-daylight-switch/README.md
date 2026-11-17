@@ -223,7 +223,7 @@ Performance varies with browser, graphics hardware, device pixel ratio and the n
 
 ```bash
 git clone https://github.com/GSvegetable/gongshui-open-source.git
-cd 1_pixel-daylight-switch
+cd gongshui-open-source/projects/pixel-daylight-switch
 npm test
 ```
 
