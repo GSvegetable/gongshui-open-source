@@ -1,0 +1,55 @@
+name: Pixel Daylight Switch quality
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "projects/pixel-daylight-switch/**"
+      - ".github/workflows/pixel-daylight-quality.yml"
+  pull_request:
+    paths:
+      - "projects/pixel-daylight-switch/**"
+      - ".github/workflows/pixel-daylight-quality.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Node ${{ matrix.node }} package and SSR checks
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Check JavaScript syntax
+        working-directory: projects/pixel-daylight-switch
+        run: node --check app.js && node --check index.cjs && node --check index.mjs
+      - name: Run package and SSR tests
+        working-directory: projects/pixel-daylight-switch
+        run: npm test
+      - name: Verify packed files
+        working-directory: projects/pixel-daylight-switch
+        run: npm pack --dry-run
+  browser:
+    name: Chromium interaction and mobile regression
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser test runner
+        working-directory: projects/pixel-daylight-switch
+        run: npm install --no-save @playwright/test@1.56.1
+      - name: Install Chromium
+        working-directory: projects/pixel-daylight-switch
+        run: npx playwright install --with-deps chromium
+      - name: Run browser stress tests
+        working-directory: projects/pixel-daylight-switch
+        run: npm run test:browser
