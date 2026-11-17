@@ -1,0 +1,144 @@
+name: Pixel Daylight Switch native builds
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "projects/pixel-daylight-switch/app.js"
+      - "projects/pixel-daylight-switch/style.css"
+      - "projects/pixel-daylight-switch/mobile/**"
+      - "projects/pixel-daylight-switch/scripts/**"
+      - "projects/pixel-daylight-switch/capacitor.config.json"
+      - "projects/pixel-daylight-switch/package.json"
+      - "projects/pixel-daylight-switch/tests/mobile-smoke.cjs"
+      - "projects/pixel-daylight-switch/docs/CHANGELOG.md"
+      - "projects/pixel-daylight-switch/README*.md"
+
+permissions:
+  contents: write
+
+jobs:
+  android:
+    name: Android debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install Android SDK packages
+        run: |
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          test -n "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null
+          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+      - name: Install dependencies and prepare app
+        working-directory: projects/pixel-daylight-switch
+        run: |
+          npm install
+          npm run mobile:prepare
+          npx cap add android
+          npx cap sync android
+          node scripts/set-android-version.cjs android/app/build.gradle
+      - name: Build APK
+        working-directory: projects/pixel-daylight-switch
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixel-daylight-switch-android-debug
+          path: projects/pixel-daylight-switch/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  ios:
+    name: iOS Simulator build
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies and prepare app
+        working-directory: projects/pixel-daylight-switch
+        run: |
+          npm install
+          npm run mobile:prepare
+          npx cap add ios
+          npx cap sync ios
+      - name: Build for iOS Simulator
+        working-directory: projects/pixel-daylight-switch
+        run: |
+          xcodebuild -project ios/App/App.xcodeproj \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath build/ios-derived \
+            build
+      - name: Package iOS Simulator app
+        working-directory: projects/pixel-daylight-switch
+        run: |
+          mkdir -p dist/ios
+          ditto -c -k --sequesterRsrc --keepParent \
+            build/ios-derived/Build/Products/Debug-iphonesimulator/App.app \
+            dist/ios/pixel-daylight-switch-ios-simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pixel-daylight-switch-ios-simulator
+          path: projects/pixel-daylight-switch/dist/ios/pixel-daylight-switch-ios-simulator.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-builds:
+    name: Publish latest mobile builds into project directory
+    needs: [android, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: pixel-daylight-switch-android-debug
+          path: dist/android
+      - uses: actions/download-artifact@v4
+        with:
+          name: pixel-daylight-switch-ios-simulator
+          path: dist/ios
+      - name: Publish stable build files
+        run: |
+          BASE="projects/pixel-daylight-switch/builds"
+          mkdir -p "$BASE/android" "$BASE/ios"
+          cp dist/android/app-debug.apk "$BASE/android/pixel-daylight-switch-debug.apk"
+          cp dist/ios/pixel-daylight-switch-ios-simulator.zip "$BASE/ios/pixel-daylight-switch-ios-simulator.zip"
+          cat > "$BASE/README.md" <<'EOF'
+          # Mobile builds
+
+          The files below are the latest successful builds produced by GitHub Actions.
+
+          - **[Download Android APK](android/pixel-daylight-switch-debug.apk)** — debug build for Android devices.
+          - **[Download iOS Simulator app](ios/pixel-daylight-switch-ios-simulator.zip)** — unsigned simulator app bundle; not for physical iPhones or iPads.
+
+          Both files are regenerated after Android and iOS build jobs succeed.
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$BASE/README.md"
+          git add -f "$BASE/android/pixel-daylight-switch-debug.apk" "$BASE/ios/pixel-daylight-switch-ios-simulator.zip"
+          if git diff --cached --quiet; then
+            echo "No build changes to publish"
+          else
+            git commit -m "build: publish latest Android and iOS simulator builds"
+            git push origin HEAD:main
+          fi
