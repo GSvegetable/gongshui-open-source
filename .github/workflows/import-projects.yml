@@ -29,17 +29,25 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Import Pixel Daylight Switch with full history
+      - name: Import or update Pixel Daylight Switch
         run: |
           git remote add pixel-daylight https://github.com/GSvegetable/1_pixel-daylight-switch.git
           git fetch pixel-daylight main
-          git subtree add --prefix=projects/pixel-daylight-switch pixel-daylight main
+          if git ls-tree HEAD projects/pixel-daylight-switch >/dev/null 2>&1 && git ls-tree HEAD projects/pixel-daylight-switch | grep -q .; then
+            git subtree pull --prefix=projects/pixel-daylight-switch pixel-daylight main
+          else
+            git subtree add --prefix=projects/pixel-daylight-switch pixel-daylight main
+          fi
 
-      - name: Import Pixel Orbit with full history
+      - name: Import or update Pixel Orbit
         run: |
           git remote add pixel-orbit https://github.com/GSvegetable/2_pixel-dusk.git
           git fetch pixel-orbit main
-          git subtree add --prefix=projects/pixel-orbit pixel-orbit main
+          if git ls-tree HEAD projects/pixel-orbit >/dev/null 2>&1 && git ls-tree HEAD projects/pixel-orbit | grep -q .; then
+            git subtree pull --prefix=projects/pixel-orbit pixel-orbit main
+          else
+            git subtree add --prefix=projects/pixel-orbit pixel-orbit main
+          fi
 
       - name: Push imported projects
         run: git push origin main
