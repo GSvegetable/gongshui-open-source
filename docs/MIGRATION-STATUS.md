@@ -2,36 +2,41 @@
 
 Updated: 2026-11-26
 
-## Extracted project implementations
+<badge>Completed source extraction and website cutover</badge>
 
-| Work | Standalone entry | Owned assets/data | Website coupling in renderer |
+## Final ownership
+
+| Work | Source of truth | Standalone entry | Host coupling |
 |---|---|---|---|
-| Contributors Globe | `projects/contributors-globe/index.html` | contributor JSON, GeoJSON, 4 Earth textures, 53 country flags, styles | no portfolio-card DOM; optional language uses document lang |
-| The Bookmark Hall | `projects/bookmark-hall/index.html` | renderer and styles | no AppState/localStorage/portfolio DOM; receives normalized data via parent postMessage |
-| Navigation Interaction System | `projects/navigation-interaction/index.html` | independent 24-button markup, styles, and interaction script | none; it is a specimen, not application navigation |
+| Contributors Globe | `projects/contributors-globe/` | `index.html` | project-owned contributor data and assets; optional origin-checked host selection message |
+| The Bookmark Hall | `projects/bookmark-hall/` | `index.html` | receives normalized bookmark records through parent postMessage; no website storage or globals |
+| Navigation Interaction System | `projects/navigation-interaction/` | `index.html` | none; independent 24-button specimen |
 
-## Host responsibilities
+The first two works remain in `projects/pixel-daylight-switch/` and `projects/pixel-orbit/`. All five works now have one source of truth in this repository.
 
-- `gongshui-pages` remains responsible for UI shell, navigation/routing, login/account, bookmark persistence/folders, search, settings, and catalog/detail presentation.
-- `gongshui-open-source` owns all five work implementations, their assets, data, documentation, versions, and quality checks.
-- The website must embed the three new standalone URLs and send bookmark records to Bookmark Hall through the documented bridge.
-- The old website copies must be removed only in the same coordinated cutover that updates the host integration.
+## Website platform responsibilities
 
-## Deployment URLs
+`gongshui-pages` retains the website UI, routing/navigation, authentication, account state, bookmark persistence/folders, search, settings, Supabase, portfolio catalog/detail panels, and a thin host adapter. It no longer contains the three extracted artwork renderers or their artwork-only assets.
 
-- `/contributors-globe/`
-- `/bookmark-hall/`
-- `/navigation-interaction/`
+The blank bookmark navigation handoff page remains a website platform page. It is not the Bookmark Hall artwork.
 
-The root Pages workflow now copies all three directories into these public URL paths while preserving the existing first-two project URLs.
+## Published URLs
 
-## Remaining cutover work
+- Pixel Daylight Switch: `/pixel-daylight-switch/preview.html`
+- Pixel Orbit: `/showcase.html`
+- Contributors Globe: `/contributors-globe/`
+- The Bookmark Hall: `/bookmark-hall/`
+- Navigation Interaction System: `/navigation-interaction/`
 
-1. Update `gongshui-pages/scripts/portfolio-preview.js` to embed the three independent URLs, pass bookmark data, and validate iframe messages.
-2. Replace the navigation sample markup with the standalone navigation iframe.
-3. Remove the old globe renderer, corridor renderer, their duplicated assets, and their styles from `gongshui-pages`; preserve the blank bookmark navigation page as platform-owned UI.
-4. Update website docs, cache query versions, and changelog.
-5. Deploy the independent projects, verify all three public URLs, then verify the website embeds and bookmark bridge.
-6. Run both repositories' CI workflows before closing the migration.
+The Pages deployment workflow assembles all five projects while preserving the existing first-two URLs.
 
-The source-extraction PR is staged independently. The live site remains unchanged until the website cutover is verified.
+## Completed integration and verification
+
+- `gongshui-open-source` PR #2 merged.
+- `gongshui-pages` PR #60 merged.
+- Independent project quality workflow passed: JavaScript syntax, required assets/data, bookmark-renderer isolation, and navigation specimen count.
+- Website shell quality workflow passed: host-adapter syntax, iframe URLs, message contracts, and absence of old renderer references.
+- Independent project GitHub Pages deployment completed successfully, including the standalone-entry verification step.
+- Website GitHub Pages deployment completed successfully.
+
+A final visual check on real mobile/tablet browsers remains useful for appearance and touch feel, but the repository ownership and deployment cutover are complete.
