@@ -13,7 +13,6 @@ Serve this directory over HTTP and open `index.html`.
 - `index.html` — standalone 24-button specimen board.
 - `styles/navigation.css` — isolated visual system.
 - `scripts/navigation.js` — selection and pressed-state interaction.
-- `scripts/portfolio-preview.js` — preserved extraction of the former website preview controller for migration history; it is not loaded by the standalone page.
 
 ## Boundary
 
