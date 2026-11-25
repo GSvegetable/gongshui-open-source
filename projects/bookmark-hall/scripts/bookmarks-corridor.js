@@ -104,39 +104,20 @@
   /* ---------------------------------------------------------
      3. 读数据：作品清单 + 收藏夹（顺序：按文件夹，再是没进文件夹的）
      --------------------------------------------------------- */
-  const readWorks = () => [...document.querySelectorAll('.preview-card[data-id]')].map(card => {
-    const panel = card.dataset.detail ? document.getElementById(card.dataset.detail) : null;
-    const iframe = card.querySelector('iframe');
-    return {
-      id: card.dataset.id,
-      title: (card.querySelector('.card-title') || {}).textContent || card.dataset.id,
-      en: card.dataset.en || '',
-      desc: ((panel && panel.querySelector('.detail-description')) || {}).textContent || '',
-      github: (panel && panel.querySelector('.project-link') && panel.querySelector('.project-link').href) || '',
-      src: (iframe && iframe.getAttribute('src')) || '',
-      ratio: parseFloat(getComputedStyle(card.querySelector('.preview-mount') || card).getPropertyValue('--mount-ratio')) || 1.6439
-    };
-  });
-  const readFolders = () => {
-    try { if (typeof AppState !== 'undefined' && Array.isArray(AppState.bookmarkFolders)) return AppState.bookmarkFolders; } catch (_) {}
-    try { const v = JSON.parse(localStorage.getItem('ui-archive-bookmark-folders') || '[]'); return Array.isArray(v) ? v : []; } catch (_) { return []; }
-  };
-  const readLoose = () => {
-    try { if (typeof AppState !== 'undefined' && Array.isArray(AppState.bookmarks)) return AppState.bookmarks; } catch (_) {}
-    try { const v = JSON.parse(localStorage.getItem('ui-archive-bookmarks') || '[]'); return Array.isArray(v) ? v : []; } catch (_) { return []; }
-  };
-  const collectItems = () => {
-    const all = readWorks();
-    const byId = new Map(all.map(w => [w.id, w]));
-    const seen = new Set();
-    const order = [];
-    const folderOf = new Map();
-    readFolders().forEach(f => (Array.isArray(f.works) ? f.works : []).forEach(id => {
-      if (byId.has(id) && !seen.has(id)) { seen.add(id); order.push(id); folderOf.set(id, f.name || ''); }
-    }));
-    readLoose().forEach(id => { if (byId.has(id) && !seen.has(id)) { seen.add(id); order.push(id); } });
-    return order.map(id => Object.assign({}, byId.get(id), { folder: folderOf.get(id) || '' }));
-  };
+  // Standalone data contract: the host sends normalized records; this renderer never
+  // reads host AppState, localStorage, or portfolio-card DOM.
+  let hostItems = [];
+  const collectItems = () => hostItems.map(item => ({
+    id: String(item.id || ''),
+    title: String(item.title || item.id || 'Untitled'),
+    en: String(item.en || ''),
+    desc: String(item.desc || ''),
+    github: /^https:\/\//.test(item.github || '') ? item.github : '',
+    src: /^(https:\/\/|\.\/|\/(?!\/))/.test(item.src || '') ? item.src : '',
+    ratio: Number(item.ratio) > 0 ? Number(item.ratio) : 1.6439,
+    folder: String(item.folder || '')
+  })).filter(item => item.id);
+
 
   /* ---------------------------------------------------------
      4. 路线：网格上的自回避折线，每段路的尽头是一个拐角（挂一件作品）
@@ -1292,7 +1273,24 @@
   new MutationObserver(sync).observe(view, { attributes: true, attributeFilter: ['hidden'] });
   if ('ResizeObserver' in window) new ResizeObserver(() => { if (running) { resize(); lastT = 0; } }).observe(view);
   window.addEventListener('resize', () => { if (running) resize(); });
-  ['site:bookmarkchange', 'site:folders', 'site:synced'].forEach(name => document.addEventListener(name, () => { if (running) { if (refreshData(false)) updateHud(true); } }));
+  // Parent bridge: accept only messages from the embedding parent. If referrer is
+  // available, require the exact origin; otherwise accept the parent window only.
+  const parentOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
+  window.addEventListener('message', event => {
+    if (event.source !== window.parent || (parentOrigin && event.origin !== parentOrigin)) return;
+    const msg = event.data;
+    if (!msg || msg.type !== 'gongshui:bookmark-hall:data' || !Array.isArray(msg.items)) return;
+    hostItems = msg.items.slice(0, 300);
+    if (running && refreshData(true)) updateHud(true);
+  });
+  window.bookmarkHall = {
+    setItems(items) {
+      if (!Array.isArray(items)) return;
+      hostItems = items.slice(0, 300);
+      if (running && refreshData(true)) updateHud(true);
+    },
+    get count() { return hostItems.length; }
+  };
   document.addEventListener('site:languagechange', () => { hudKey = ''; if (running && world) updateHud(true); });
 
   // 给调试 / 其他脚本留一个小接口
