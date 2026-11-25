@@ -44,7 +44,7 @@ This project is an interactive specimen of the site's pixel button visual langua
 
 ## Deployment
 
-The root workflow `.github/workflows/pixel-orbit-pages.yml` assembles the published Pages site:
+The root workflow `.github/workflows/deploy-project-sites.yml` assembles the published Pages site:
 - `projects/pixel-orbit/` → site root (preserves existing URLs);
 - `projects/pixel-daylight-switch/` → `/pixel-daylight-switch/`;
 - the three extracted projects → `/contributors-globe/`, `/bookmark-hall/`, and `/navigation-interaction/`.
