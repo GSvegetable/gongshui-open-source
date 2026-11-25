@@ -2,7 +2,7 @@
 
 Updated: 2026-11-26
 
-<badge>Completed source extraction and website cutover</badge>
+**Completed source extraction and website cutover.**
 
 ## Final ownership
 
