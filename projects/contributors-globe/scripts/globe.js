@@ -16,7 +16,7 @@
 
   const REPO = 'GSvegetable/gongshui-open-source';
   // 资源全部内置在仓库里：不依赖 unpkg / flagcdn，国内网络打开也能正常显示
-  const GLOBE_LIB = 'https://cdn.jsdelivr.net/npm/globe.gl@2.41.12/dist/globe.gl.min.js';
+  const GLOBE_LIB = 'https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js';
   const IMG = './assets/earth/';
   const COUNTRY_GEOJSON = './data/ne_110m_admin_0_countries.geojson';
   const DATA_URL = './data/contributors.json';
