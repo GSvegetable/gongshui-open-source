@@ -9,7 +9,7 @@ on:
       - "projects/contributors-globe/**"
       - "projects/bookmark-hall/**"
       - "projects/navigation-interaction/**"
-      - ".github/workflows/pixel-orbit-pages.yml"
+      - ".github/workflows/deploy-project-sites.yml"
   workflow_dispatch:
 
 permissions:
