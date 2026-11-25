@@ -31,9 +31,9 @@ A dependency-free pixel-art world with countryside, planet and ring-world scenes
 |---|---|---|
 | 1 | Pixel Daylight Switch | This repository |
 | 2 | Pixel Orbit | This repository |
-| 3 | Contributors Globe | [`gongshui-pages`](https://github.com/GSvegetable/gongshui-pages/tree/main/scripts/globe.js) |
-| 4 | The Bookmark Hall | [`gongshui-pages`](https://github.com/GSvegetable/gongshui-pages/tree/main/scripts/bookmarks-corridor.js) |
-| 5 | Navigation Interaction System | [`gongshui-pages`](https://github.com/GSvegetable/gongshui-pages/tree/main/scripts/portfolio-preview.js) and its `index.html` / styles |
+| 3 | Contributors Globe | [`gongshui-pages`](https://github.com/GSvegetable/gongshui-pages/blob/main/scripts/globe.js) |
+| 4 | The Bookmark Hall | [`gongshui-pages`](https://github.com/GSvegetable/gongshui-pages/blob/main/scripts/bookmarks-corridor.js) |
+| 5 | Navigation Interaction System | [`gongshui-pages`](https://github.com/GSvegetable/gongshui-pages/blob/main/scripts/portfolio-preview.js) and its `index.html` / styles |
 
 Works 3–5 currently depend on website data, state or presentation structure. They are intentionally not duplicated here. Their ownership and extraction requirements are documented in the [website architecture guide](https://github.com/GSvegetable/gongshui-pages/blob/main/docs/ARCHITECTURE.md).
 
