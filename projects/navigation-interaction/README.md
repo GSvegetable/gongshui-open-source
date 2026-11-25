@@ -1,7 +1,24 @@
 # Navigation Interaction System / 导航交互系统
 
-Version: 1.1.0 (migration baseline)
+Version: **1.0.0** (first independent release)
 
-This is a visual interaction specimen, not the website's navigation implementation. The host website keeps its actual navigation, routing, history, and accessibility behavior. This project owns only the independent sample board and its tactile button interaction states.
+An interactive specimen board for the pixel-style button language used by Gongshui. It demonstrates 24 tactile button states and remains deliberately separate from the real website navigation.
 
-The previous `portfolio-preview.js` file was a website showcase controller rather than the navigation system itself. It is retained here as migration history; the standalone specimen entry point and interaction model must replace it before the website switches to this project.
+## Run
+
+Serve this directory over HTTP and open `index.html`.
+
+## Structure
+
+- `index.html` — standalone 24-button specimen board.
+- `styles/navigation.css` — isolated visual system.
+- `scripts/navigation.js` — selection and pressed-state interaction.
+- `scripts/portfolio-preview.js` — preserved extraction of the former website preview controller for migration history; it is not loaded by the standalone page.
+
+## Boundary
+
+The website continues to own actual navigation, routes, history, and accessibility behavior. This project owns only the independent interaction specimen. It must never be used as a replacement for the host application's routing or navigation logic.
+
+## Rights
+
+The original Gongshui artwork and project source remain copyrighted by their author unless a file states otherwise. No blanket redistribution license is granted by this repository.
