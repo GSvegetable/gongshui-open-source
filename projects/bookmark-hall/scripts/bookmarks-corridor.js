@@ -75,8 +75,7 @@
      2. 文案（中 / 英 / 日；作品标题与简介直接读页面上已翻译的 DOM）
      --------------------------------------------------------- */
   const lang = () => {
-    const l = (window.siteI18n && window.siteI18n.lang) || document.documentElement.lang || 'zh';
-    const s = String(l).toLowerCase();
+    const s = String(document.documentElement.lang || 'zh').toLowerCase();
     return s.startsWith('en') ? 'en' : s.startsWith('ja') ? 'ja' : 'zh';
   };
   const TEXT = {
@@ -1291,7 +1290,7 @@
     },
     get count() { return hostItems.length; }
   };
-  document.addEventListener('site:languagechange', () => { hudKey = ''; if (running && world) updateHud(true); });
+  window.addEventListener('languagechange', () => { hudKey = ''; if (running && world) updateHud(true); });
 
   // 给调试 / 其他脚本留一个小接口
   window.siteCorridor = {
