@@ -1,19 +1,37 @@
 # Three-project extraction status
 
-This migration is deliberately staged to avoid breaking the live website.
+Updated: 2026-11-26
 
-| Work | Extracted source | Still coupled / outstanding |
-|---|---|---|
-| Contributors Globe | renderer JS, CSS, contributor JSON | Earth textures, flags, country GeoJSON; host selectors, language and portfolio callbacks; standalone preview |
-| Bookmark Hall | renderer JS and CSS | bookmark AppState/localStorage, folders, site events, portfolio-card DOM; postMessage host bridge; standalone preview |
-| Navigation Interaction System | existing preview controller and styles | actual sample-board markup/interaction must become a self-contained project; site navigation remains host-owned |
+## Extracted project implementations
 
-## Ownership rule
+| Work | Standalone entry | Owned assets/data | Website coupling in renderer |
+|---|---|---|---|
+| Contributors Globe | `projects/contributors-globe/index.html` | contributor JSON, GeoJSON, 4 Earth textures, 53 country flags, styles | no portfolio-card DOM; optional language uses document lang |
+| The Bookmark Hall | `projects/bookmark-hall/index.html` | renderer and styles | no AppState/localStorage/portfolio DOM; receives normalized data via parent postMessage |
+| Navigation Interaction System | `projects/navigation-interaction/index.html` | independent 24-button markup, styles, and interaction script | none; it is a specimen, not application navigation |
 
-- `gongshui-pages` owns the website shell, authentication, navigation, bookmark persistence, search, settings, portfolio catalog, and host adapters.
-- `gongshui-open-source` owns artwork implementations, their assets, versions, documentation, tests, and standalone previews.
-- A work is not considered fully migrated until the website no longer contains a second authoritative implementation and the deployed standalone preview passes a browser smoke test.
+## Host responsibilities
 
-## Safety rule
+- `gongshui-pages` remains responsible for UI shell, navigation/routing, login/account, bookmark persistence/folders, search, settings, and catalog/detail presentation.
+- `gongshui-open-source` owns all five work implementations, their assets, data, documentation, versions, and quality checks.
+- The website must embed the three new standalone URLs and send bookmark records to Bookmark Hall through the documented bridge.
+- The old website copies must be removed only in the same coordinated cutover that updates the host integration.
 
-Keep the existing website runtime in place until each migrated project has a deployed preview and the host integration is verified. A source-only copy is not a completed migration.
+## Deployment URLs
+
+- `/contributors-globe/`
+- `/bookmark-hall/`
+- `/navigation-interaction/`
+
+The root Pages workflow now copies all three directories into these public URL paths while preserving the existing first-two project URLs.
+
+## Remaining cutover work
+
+1. Update `gongshui-pages/scripts/portfolio-preview.js` to embed the three independent URLs, pass bookmark data, and validate iframe messages.
+2. Replace the navigation sample markup with the standalone navigation iframe.
+3. Remove the old globe renderer, corridor renderer, their duplicated assets, and their styles from `gongshui-pages`; preserve the blank bookmark navigation page as platform-owned UI.
+4. Update website docs, cache query versions, and changelog.
+5. Deploy the independent projects, verify all three public URLs, then verify the website embeds and bookmark bridge.
+6. Run both repositories' CI workflows before closing the migration.
+
+The source-extraction PR is staged independently. The live site remains unchanged until the website cutover is verified.
