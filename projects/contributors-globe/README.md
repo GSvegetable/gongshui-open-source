@@ -1,27 +1,27 @@
 # Contributors Globe / 投稿者地球
 
-Version: 2.10.0 (migration baseline)
+Version: **1.0.0** (first independent release)
 
-This project contains the original globe renderer, its styling, contributor data, and the globe.gl runtime slot extracted from the Gongshui website.
+A standalone interactive globe showing contributors by country. The project owns its renderer, data, geographic boundaries, flag assets, and Earth textures.
 
-## Source layout
+## Run
 
-- `scripts/globe.js` — rendering, contributor normalization, interaction, WebGL fallback.
-- `styles/globe.css` — globe presentation.
+Serve this directory over HTTP (for example, with `python -m http.server`) and open `index.html`. WebGL is used when available; the renderer retains a list fallback when it is not.
+
+## Structure
+
+- `index.html` — standalone entry.
+- `scripts/globe.js` — rendering, contributor normalization, interaction, and fallback.
+- `styles/globe.css` — project styles.
 - `data/contributors.json` — contributor records.
-- `assets/earth/` — Earth textures (migration in progress).
-- `assets/flags/` — country flags (migration in progress).
-- `data/ne_110m_admin_0_countries.geojson` — country boundaries (migration in progress).
+- `data/ne_110m_admin_0_countries.geojson` — country boundaries.
+- `assets/earth/` — original Earth textures.
+- `assets/flags/` — country flags.
 
-## Host boundary
+## Runtime dependency
 
-The original implementation still contains website-specific selectors and callbacks (`#compass-view`, `siteI18n`, portfolio cards, and the GitHub issue submission route). Those are not part of the visual renderer's public API. The standalone host adapter must provide:
-- a mount element and asset base URL;
-- contributor data;
-- optional translation and work-opening callbacks.
+Globe.GL **2.46.2** is loaded from the pinned jsDelivr URL in `scripts/globe.js`. Globe.GL is distributed under the MIT License. See [upstream package and license](https://www.npmjs.com/package/globe.gl). The renderer falls back to the contributor list if WebGL or the 3D runtime is unavailable.
 
-Do not delete the website's current runtime copy until the standalone preview and host adapter pass browser checks. This migration intentionally keeps the source website intact during extraction.
+## Rights
 
-## License
-
-The source files retain the licensing terms of their original repository and bundled dependencies. Do not assume that copying the files changes their license.
+The original Gongshui artwork and project source remain copyrighted by their author unless a file states otherwise. Third-party assets and libraries retain their own licenses. No blanket redistribution license is granted by this repository.
