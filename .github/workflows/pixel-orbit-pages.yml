@@ -39,7 +39,7 @@ jobs:
       - name: Assemble all project sites
         run: |
           rm -rf _site
-          mkdir -p _site/pixel-daylight-switch
+          mkdir -p _site/pixel-daylight-switch _site/contributors-globe _site/bookmark-hall _site/navigation-interaction
           cp -a projects/pixel-orbit/. _site/
           cp -a projects/pixel-daylight-switch/. _site/pixel-daylight-switch/
           cp -a projects/contributors-globe/. _site/contributors-globe/
