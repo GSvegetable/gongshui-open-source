@@ -977,4 +977,13 @@
       if (contributors.length) applyPendingSelect();
     },
   };
+
+  const hostOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
+  window.addEventListener('message', event => {
+    if (event.source !== window.parent || (hostOrigin && event.origin !== hostOrigin)) return;
+    const message = event.data;
+    if (message && message.type === 'gongshui:contributors-globe:select-work' && typeof message.workId === 'string') {
+      window.siteGlobe.selectWork(message.workId);
+    }
+  });
 })();
