@@ -9,8 +9,7 @@
      内部分辨率只有屏幕的 1/2 ~ 1/3，放大后正好是像素风，和全站一致。
    · 墙上的画框是程序画出来的像素画；走到作品面前，点画框才会打开
      真正的实时作品（iframe）和详情。
-   · 数据直接读 main.js 维护的收藏夹（localStorage + AppState），
-     不需要改动 main.js；新作品照旧「复制卡片」就会自动出现在长廊里。
+   · 收藏记录由宿主通过 postMessage 传入；渲染器不管理账号或持久化。
    · 路线由固定种子生成：同一份收藏每次走进来都是同一条长廊，
      多收藏一件，长廊就在尾部多延伸一段。
    ========================================================= */
@@ -104,7 +103,7 @@
      3. 读数据：作品清单 + 收藏夹（顺序：按文件夹，再是没进文件夹的）
      --------------------------------------------------------- */
   // Standalone data contract: the host sends normalized records; this renderer never
-  // reads host AppState, localStorage, or portfolio-card DOM.
+  // reads host application state, browser storage, or portfolio-card DOM.
   let hostItems = [];
   const collectItems = () => hostItems.map(item => ({
     id: String(item.id || ''),
