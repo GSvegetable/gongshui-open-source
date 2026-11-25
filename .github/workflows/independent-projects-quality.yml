@@ -1,0 +1,51 @@
+name: Independent project quality
+
+on:
+  pull_request:
+    paths:
+      - "projects/contributors-globe/**"
+      - "projects/bookmark-hall/**"
+      - "projects/navigation-interaction/**"
+      - ".github/workflows/independent-projects-quality.yml"
+  push:
+    branches: [main]
+    paths:
+      - "projects/contributors-globe/**"
+      - "projects/bookmark-hall/**"
+      - "projects/navigation-interaction/**"
+      - ".github/workflows/independent-projects-quality.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check JavaScript syntax
+        run: |
+          node --check projects/contributors-globe/scripts/globe.js
+          node --check projects/bookmark-hall/scripts/bookmarks-corridor.js
+          node --check projects/navigation-interaction/scripts/navigation.js
+      - name: Check project boundaries and required assets
+        run: |
+          ! grep -Eq 'AppState|localStorage|preview-card|siteI18n' projects/bookmark-hall/scripts/bookmarks-corridor.js
+          grep -q 'gongshui:bookmark-hall:data' projects/bookmark-hall/scripts/bookmarks-corridor.js
+          grep -q 'globe.gl@2.46.2' projects/contributors-globe/scripts/globe.js
+          test -s projects/contributors-globe/index.html
+          test -s projects/contributors-globe/data/contributors.json
+          test -s projects/contributors-globe/data/ne_110m_admin_0_countries.geojson
+          test -s projects/contributors-globe/assets/earth/earth-blue-marble.jpg
+          test -s projects/contributors-globe/assets/earth/earth-night.jpg
+          test -s projects/contributors-globe/assets/earth/earth-topology.png
+          test -s projects/contributors-globe/assets/earth/night-sky.jpg
+          test -s projects/bookmark-hall/index.html
+          test -s projects/navigation-interaction/index.html
+      - name: Check navigation specimen count
+        run: |
+          count=$(grep -o 'data-nav-sample=' projects/navigation-interaction/index.html | wc -l)
+          test "$count" -eq 24
