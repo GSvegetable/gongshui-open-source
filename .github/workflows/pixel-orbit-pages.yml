@@ -6,6 +6,9 @@ on:
     paths:
       - "projects/pixel-orbit/**"
       - "projects/pixel-daylight-switch/**"
+      - "projects/contributors-globe/**"
+      - "projects/bookmark-hall/**"
+      - "projects/navigation-interaction/**"
       - ".github/workflows/pixel-orbit-pages.yml"
   workflow_dispatch:
 
@@ -33,13 +36,28 @@ jobs:
         with:
           enablement: true
 
-      - name: Assemble both project sites
+      - name: Assemble all project sites
         run: |
           rm -rf _site
           mkdir -p _site/pixel-daylight-switch
           cp -a projects/pixel-orbit/. _site/
           cp -a projects/pixel-daylight-switch/. _site/pixel-daylight-switch/
+          cp -a projects/contributors-globe/. _site/contributors-globe/
+          cp -a projects/bookmark-hall/. _site/bookmark-hall/
+          cp -a projects/navigation-interaction/. _site/navigation-interaction/
           touch _site/.nojekyll
+
+      - name: Verify standalone entry points
+        run: |
+          test -s _site/contributors-globe/index.html
+          test -s _site/bookmark-hall/index.html
+          test -s _site/navigation-interaction/index.html
+          test -s _site/contributors-globe/data/contributors.json
+          test -s _site/contributors-globe/data/ne_110m_admin_0_countries.geojson
+          test -s _site/contributors-globe/assets/earth/earth-blue-marble.jpg
+          test -s _site/contributors-globe/assets/earth/earth-night.jpg
+          test -s _site/contributors-globe/assets/earth/earth-topology.png
+          test -s _site/contributors-globe/assets/earth/night-sky.jpg
 
       - name: Upload consolidated site
         uses: actions/upload-pages-artifact@v3
