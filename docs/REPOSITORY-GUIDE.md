@@ -1,79 +1,65 @@
 # Repository guide
 
 > Repository: `GSvegetable/gongshui-open-source`  
-> Checked: 2026-11-26
+> Updated: 2026-11-26
 
-## Scope
+## Scope and ownership
 
-This is a multi-project repository for independently runnable works. It is not a mirror of every work displayed on [Gongshui.com](https://xn--3bts89a.com/).
+This repository is the source of truth for the implementations of all independently developed works displayed by Gongshui.com. The website repository, `gongshui-pages`, owns the platform shell: UI chrome, routing, authentication, account state, bookmarks and folders, search, settings, catalog metadata, and host-side adapters.
 
-The repository currently contains two independent projects:
+| # | Project | Source of truth | Standalone URL after deployment | Version |
+|---|---|---|---|---|
+| 1 | Pixel Daylight Switch | `projects/pixel-daylight-switch/` | `/pixel-daylight-switch/preview.html` | npm package 3.1.1 |
+| 2 | Pixel Orbit | `projects/pixel-orbit/` | `/showcase.html` | 1.2.3 |
+| 3 | Contributors Globe | `projects/contributors-globe/` | `/contributors-globe/` | 1.0.0 |
+| 4 | The Bookmark Hall | `projects/bookmark-hall/` | `/bookmark-hall/` | 1.0.0 |
+| 5 | Navigation Interaction System | `projects/navigation-interaction/` | `/navigation-interaction/` | 1.0.0 |
 
-| Project | Source of truth | Current project version | Terms |
-|---|---|---:|---|
-| Pixel Daylight Switch | `projects/pixel-daylight-switch/` | npm package `3.1.1` | Unlicense; see the project's `LICENSE` |
-| Pixel Orbit | `projects/pixel-orbit/` | `1.2.3` | No license is specified; copyright remains with the author. Do not redistribute or reuse without permission. |
+Each project owns its implementation, assets, tests, version, changelog and dependency notices. There is no monorepo-wide product version or blanket license. The first two projects retain their existing licensing terms. The migrated projects retain the original author's copyright unless a specific third-party license applies; do not infer a broad reuse license.
 
-There is deliberately no repository-wide product version or blanket license. A project’s version and license are defined by that project, not inferred from the repository name.
+## Host / artwork boundary
 
-## Portfolio integration
+The website must not contain a second authoritative copy of a project's renderer. It may contain a small host adapter, but that adapter may only:
+- mount or iframe the deployed project;
+- pass public data through a documented message/API contract;
+- handle authentication, persistence, routing, and opening website detail views;
+- handle graceful loading and error states.
 
-The first two portfolio cards on `gongshui-pages` embed the published project pages:
+A work must not read website globals, private localStorage keys, or host page selectors.
 
-- Pixel Daylight Switch: `https://gsvegetable.github.io/gongshui-open-source/pixel-daylight-switch/preview.html`
-- Pixel Orbit: `https://gsvegetable.github.io/gongshui-open-source/showcase.html?scene=planet&composition=art`
+### Bookmark Hall bridge
 
-The other three works currently belong to the website repository:
+The standalone corridor accepts:
+`{ type: "gongshui:bookmark-hall:data", items: [...] }` from its parent window. Each item contains `id`, `title`, optional `en`, `desc`, `github`, `src`, `ratio`, and `folder`. The renderer emits `{ type: "gongshui:bookmark-hall:open", id }` when a frame is selected. The parent must validate `event.origin`, map bookmark/folder state to these public records, and perform any site navigation itself. The renderer never accesses AppState or localStorage.
 
-- Contributors Globe: `gongshui-pages/scripts/globe.js` plus its styles, data and assets.
-- The Bookmark Hall: `gongshui-pages/scripts/bookmarks-corridor.js` plus its website bookmark-state integration.
-- Navigation Interaction System: markup in `gongshui-pages/index.html`, behavior in `scripts/portfolio-preview.js`, and styles in `styles/portfolio-works.css`.
+### Contributors Globe
 
-See the [website architecture document](https://github.com/GSvegetable/gongshui-pages/blob/main/docs/ARCHITECTURE.md) for file-level ownership and the criteria for extracting website-coupled works.
+The standalone globe has its own mount element, contributor JSON, country-boundary data, flag assets, and Earth textures. It has a local language fallback based on the document's `lang`; the website may set that attribute when embedding. The renderer does not require website portfolio-card markup.
 
-## Repository layout
+The current Globe.GL runtime is pinned to an exact jsDelivr version in the standalone script and is MIT-licensed. Its package license and version are documented upstream: https://www.npmjs.com/package/globe.gl
 
-```text
-.github/workflows/                 # Active monorepo CI and deployment workflows
-projects/
-  pixel-daylight-switch/           # Package, browser component, mobile builds and docs
-  pixel-orbit/                     # Three scenes, showcase, lab, docs and smoke tests
-docs/
-  REPOSITORY-GUIDE.md              # This repository's boundaries and maintenance rules
-README.md                          # Repository entry point
-```
+### Navigation Interaction System
 
-## GitHub Actions
+This project is an interactive specimen of the site's pixel button visual language. It is not the website's real navigation implementation. Actual routing, navigation accessibility, and application behavior remain in `gongshui-pages`.
 
-Only workflow files placed directly under the repository-root `.github/workflows/` directory are active GitHub Actions workflows for this repository.
+## Deployment
 
-The `.github/workflows/` folders nested inside individual project directories are retained standalone-project workflow snapshots from the imported project histories. GitHub does not execute those nested files as repository workflows. The active root workflows are adapted for this monorepo and set the correct `working-directory` or copy the project into the GitHub Pages artifact.
+The root workflow `.github/workflows/pixel-orbit-pages.yml` assembles the published Pages site:
+- `projects/pixel-orbit/` → site root (preserves existing URLs);
+- `projects/pixel-daylight-switch/` → `/pixel-daylight-switch/`;
+- the three extracted projects → `/contributors-globe/`, `/bookmark-hall/`, and `/navigation-interaction/`.
 
-The root Pages workflow assembles the published site as follows:
+Do not point website iframes at `/projects/...`; that prefix is source-only and is not part of the deployed URL.
 
-1. Copy `projects/pixel-orbit/` to the published site root.
-2. Copy `projects/pixel-daylight-switch/` to the published `pixel-daylight-switch/` subdirectory.
-3. Deploy the assembled `_site/` directory.
+## Quality gates
 
-This is why the live URLs omit the source-only `projects/` prefix. Do not change the portfolio iframe URLs to include `/projects/` unless the deployment assembly is changed at the same time.
+Before a project is considered migrated:
+1. Its standalone entry point must run without the portfolio host.
+2. All runtime assets must be present in the deployed artifact.
+3. Host communication must use a documented, origin-checked interface.
+4. There must be no hidden dependency on website globals, private storage keys, or host DOM.
+5. The website iframe integration must be tested.
+6. The website's duplicate implementation must be removed or reduced to a host adapter.
+7. Project version, changelog, dependency notices and root deployment workflow must be updated together.
 
-## Versioning
-
-- Pixel Daylight Switch: update `projects/pixel-daylight-switch/package.json`, its project changelog and the `pixel-daylight-v<version>` release tag together.
-- Pixel Orbit: update its README version, `CHANGELOG.md`, and any release metadata together.
-- The monorepo itself has no single semantic version.
-- URL query values used for cache invalidation or embed composition are not automatically project release versions.
-
-## Adding or extracting a project
-
-Before adding a project here, make sure it has:
-
-1. A standalone entry point that works without the portfolio host.
-2. Its own assets and data paths.
-3. No hidden dependency on website globals, private localStorage keys or host DOM selectors.
-4. A project README and explicit license / usage terms.
-5. A project-level changelog and versioning policy.
-6. Tests or smoke checks appropriate to its runtime.
-7. A root workflow configured for the monorepo paths and working directory.
-
-Do not copy a site-owned implementation here while leaving the original active in `gongshui-pages`. First define which repository owns the source of truth and a stable integration API, then move the implementation and update the host embed in one coordinated change.
+The extraction branch is staged separately so the live website remains intact until the host-side cutover is verified.
