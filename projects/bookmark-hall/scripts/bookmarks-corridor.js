@@ -1123,6 +1123,11 @@
 
   function openViewer(item) {
     if (!item || viewerOpen) return;
+    if (window.parent !== window) {
+      const targetOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : '*'; } catch (_) { return '*'; } })();
+      window.parent.postMessage({ type: 'gongshui:bookmark-hall:open', id: item.id }, targetOrigin);
+      return;
+    }
     viewerOpen = true;
     ui.vtitle.textContent = item.title;
     ui.ven.textContent = item.en; ui.ven.hidden = !item.en;
