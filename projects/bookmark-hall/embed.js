@@ -79,7 +79,7 @@
 
   const onFrameLoad = () => {
     frameReady = true;
-    resolveReady(frame.contentDocument ? true : false);
+    resolveReady(true);
     while (pendingMessages.length) frame.contentWindow.postMessage(pendingMessages.shift(), frameOrigin);
   };
 
