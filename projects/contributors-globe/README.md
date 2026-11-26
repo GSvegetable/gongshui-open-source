@@ -28,7 +28,8 @@ Version: **1.2.0**
 | `data-pins` | `1` | `0` 隐藏地球表面的投稿者标记 |
 | `data-controls` | `1` | `0` 隐藏右下角昼夜/旗帜等控制图标 |
 | `data-search` | `1` | `0` 隐藏投稿者搜索栏 |
-| `data-flag` | `1` | `0` 只隐藏“提交旗帜”入口，保留昼夜切换 |
+| `data-flag` | `1` | `0` 隐藏投稿入口 |
+| `data-submit-url` | 无 | 可选的 HTTPS 投稿地址；不设置时不会显示投稿入口，也不会向任何仓库发送投稿 |
 | `data-width` | `100%` | 容器宽度 |
 | `data-height` | 自动 | 明确指定容器高度，例如 `420px` |
 | `data-ratio` | `1.6439` | 未指定高度时的宽高比 |
@@ -69,6 +70,6 @@ Add one script tag where the globe should appear. This creates its own container
 <script src="https://gsvegetable.github.io/gongshui-open-source/contributors-globe/embed.js" data-pins="0" data-controls="0" data-search="0"></script>
 ```
 
-Set `data-flag="0"` to hide only the flag submission link; set `data-pins="0"` to hide contributor markers; set `data-search="0"` to hide search. The JavaScript API is available at the generated element's `.gongshuiEmbed` property. Await `api.ready`, subscribe with `api.onOpenWork(callback)`, and call `api.destroy()` when removing the component.
+投稿入口默认不连接任何人的仓库：只有显式设置 `data-submit-url="https://your-own-submission-page"` 才会显示投稿图标并打开你指定的 HTTPS 地址。组件不会自动提交表单或写入任何数据库。设置 `data-flag="0"` 可隐藏投稿入口；设置 `data-pins="0"` 可隐藏投稿者标记；设置 `data-search="0"` 可隐藏搜索。 The JavaScript API is available at the generated element's `.gongshuiEmbed` property. Await `api.ready`, subscribe with `api.onOpenWork(callback)`, and call `api.destroy()` when removing the component.
 
 The MIT license covers original source code/styles, not contributor personal data or third-party Earth imagery, flags, maps, and libraries. See [asset licensing](ASSET-LICENSING.md).
