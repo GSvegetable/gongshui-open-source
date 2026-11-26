@@ -65,3 +65,15 @@ buttons.destroy();
 ## 许可
 
 本目录的原创源代码与交互样式按本目录 `LICENSE`（MIT）授权。
+
+## English quick start
+
+Embed one sample with a single script tag (sample indices are zero-based):
+
+```html
+<script src="https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/embed.js" data-sample="7"></script>
+```
+
+Embed a subset with `data-samples="0,2,7,14"`, or omit the filter to show all 24 samples. Filtered embeds remove the showcase heading/footer so the buttons work as standalone UI components. Await `api.ready`, use `api.select(index)`, subscribe with `api.onSelect(callback)`, and call `api.reset()` or `api.destroy()` as needed.
+
+The project-level MIT license covers the original component source, sample markup, and authored styles.
