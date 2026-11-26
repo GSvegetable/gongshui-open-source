@@ -1,0 +1,8 @@
+{
+  "contributors": [
+    {"id":"lab-demo-tokyo","name":"DEMO / TOKYO","country":"JP","city":"Tokyo","note":"虚构演示资料 · 用于观察地球标记"},
+    {"id":"lab-demo-helsinki","name":"DEMO / HELSINKI","country":"FI","city":"Helsinki","note":"虚构演示资料 · 不代表真实投稿者"},
+    {"id":"lab-demo-toronto","name":"DEMO / TORONTO","country":"CA","city":"Toronto","note":"虚构演示资料 · 仅用于实验室预览"},
+    {"id":"lab-demo-sao-paulo","name":"DEMO / SÃO PAULO","country":"BR","city":"São Paulo","note":"虚构演示资料 · 不会写入正式数据"}
+  ]
+}
