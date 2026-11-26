@@ -60,6 +60,19 @@ jobs:
           grep -q 'setLanguage' projects/contributors-globe/embed.js
           grep -q 'setLanguage' projects/bookmark-hall/embed.js
           grep -q 'setLanguage' projects/navigation-interaction/embed.js
+          grep -q 'const ready = new Promise' projects/contributors-globe/embed.js
+          grep -q 'const ready = new Promise' projects/bookmark-hall/embed.js
+          grep -q 'const ready = new Promise' projects/navigation-interaction/embed.js
+          grep -q "get('pins') !== '0'" projects/contributors-globe/scripts/globe.js
+          grep -q "get('controls') === '0'" projects/bookmark-hall/scripts/bookmarks-corridor.js
+          grep -q 'MAX_ITEMS' projects/bookmark-hall/scripts/bookmarks-corridor.js
+          grep -q "params.get('samples')" projects/navigation-interaction/scripts/navigation.js
+          grep -q 'data-sample' projects/navigation-interaction/README.md
+          grep -q 'data-pins' projects/contributors-globe/README.md
+          grep -q 'setItems' projects/bookmark-hall/README.md
+          test -s projects/contributors-globe/LICENSE
+          test -s projects/bookmark-hall/LICENSE
+          test -s projects/navigation-interaction/LICENSE
           grep -q 'gongshui:embed:language' projects/contributors-globe/scripts/globe.js
           grep -q 'gongshui:embed:language' projects/bookmark-hall/scripts/bookmarks-corridor.js
           grep -q 'gongshui:embed:language' projects/navigation-interaction/scripts/navigation.js
