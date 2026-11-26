@@ -42,7 +42,9 @@ body{display:grid;place-items:center}
     }
   };
   window.addEventListener('message', event => {
-    if (!event.data || event.data.type !== 'pds-set-scene') return;
+    if (event.source !== window.parent || !event.data) return;
+    if (event.data.type === 'pds-ping') { announce(); return; }
+    if (event.data.type !== 'pds-set-scene') return;
     setScene(event.data.scene);
   });
   // Signal only after the component has mounted and the browser had two paint opportunities.
