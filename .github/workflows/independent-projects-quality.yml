@@ -76,6 +76,8 @@ jobs:
           grep -q 'data-sample' projects/navigation-interaction/README.md
           grep -q 'data-pins' projects/contributors-globe/README.md
           grep -q 'data-submit-url' projects/contributors-globe/embed.js
+          grep -q 'data-contributors-src' projects/contributors-globe/embed.js
+          grep -q "get('data')" projects/contributors-globe/scripts/globe.js
           grep -q "get('submit')" projects/contributors-globe/scripts/globe.js
           ! grep -Eq 'GSvegetable|github.com/GSvegetable|issueUrl' projects/contributors-globe/data/contributors.json projects/contributors-globe/scripts/globe.js projects/contributors-globe/embed.js
           node -e "const data = require('./projects/contributors-globe/data/contributors.json'); if (!Array.isArray(data.contributors) || data.contributors.length !== 0) process.exit(1)"
