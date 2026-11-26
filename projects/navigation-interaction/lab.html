@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5ecd9"><title>导航交互系统 · 实验室</title>
+<style>
+:root{color-scheme:light;--paper:#f5ecd9;--ink:#211d15;--muted:#766c5b;--line:#c9bda8;--yellow:#f0bd43;--panel:#fffaf0}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.shell{width:min(1240px,calc(100% - 32px));margin:auto;padding:24px 0 48px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--ink);padding-bottom:16px}.brand{font-size:12px;font-weight:900;letter-spacing:.16em}.back{font-size:11px;color:var(--muted);text-decoration:none}.back:hover{color:#9b6c11}
+.intro{padding:28px 0 20px}.kicker{font-size:10px;color:#9b6c11;letter-spacing:.2em;font-weight:900}h1{font-size:clamp(28px,5vw,48px);line-height:1.05;letter-spacing:-.06em;margin:10px 0}.lede{font-size:12px;color:var(--muted);max-width:760px;margin:0}
+.workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.7fr);gap:16px;align-items:start}.preview,.panel{border:2px solid var(--ink);background:var(--panel);box-shadow:5px 5px 0 var(--ink)}.preview-head{display:flex;justify-content:space-between;padding:12px 14px;border-bottom:2px solid var(--ink);font-size:10px;font-weight:900;letter-spacing:.12em}.stage{height:clamp(340px,42vw,540px);background:#171717;position:relative}.stage>div{position:absolute;inset:0;width:100%;height:100%}
+.panel{padding:16px}.panel h2{font-size:12px;margin:0 0 14px}.group{border-top:1px solid var(--line);padding:12px 0}.group:first-of-type{border-top:0;padding-top:0}.group-title{display:block;font-size:10px;color:var(--muted);font-weight:900;letter-spacing:.12em;margin-bottom:9px}
+.actions{display:flex;flex-wrap:wrap;gap:7px}button,select,input{font:inherit}button{cursor:pointer;border:2px solid var(--ink);background:#fffaf0;color:var(--ink);padding:7px 10px;font-size:11px;font-weight:800;box-shadow:2px 2px 0 var(--ink)}button:hover{background:#ffe7ac}button.active,button[aria-pressed=true]{background:var(--yellow)}
+select{width:100%;padding:8px;border:2px solid var(--ink);background:#fffaf0;color:var(--ink);font-size:11px}
+.range{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:11px;margin:9px 0}.range input{grid-column:1/-1;width:100%;accent-color:#c68b22}.range output{font-variant-numeric:tabular-nums;color:#946714}
+.status{font-size:10px;color:#795a1b;min-height:32px;margin-top:10px}.event{margin-top:12px;border:1px solid var(--line);padding:10px;background:#f7efdf;font-size:10px;color:var(--muted);min-height:64px;line-height:1.8}.event strong{color:var(--ink)}
+.info{margin-top:16px;padding:14px;border:1px solid var(--line);font-size:11px;color:var(--muted);line-height:1.8;background:#f8f1e4}.foot{margin-top:22px;font-size:9px;color:#887d6a;letter-spacing:.14em}
+@media(max-width:800px){.shell{width:calc(100% - 22px);padding-top:14px}.workspace{grid-template-columns:1fr}.stage{height:clamp(320px,86vw,480px)}.intro{padding-top:22px}}
+</style></head><body><main class="shell">
+<header class="top"><span class="brand">GONGSHUI / NAVIGATION INTERACTION</span><a class="back" href="https://xn--3bts89a.com/">← 返回宫水.com</a></header>
+<section class="intro"><div class="kicker">INTERACTION LAB / 05</div><h1>导航交互系统实验室</h1><p class="lede">二十四枚像素按钮，一个实时工作台。调整图标颜色、动画、按压反馈与联动方式，点击预览中的任意按钮，立即观察状态变化。</p></section>
+<div class="workspace"><section class="preview"><div class="preview-head"><span>24 INTERACTION SAMPLES</span><span>LIVE PREVIEW</span></div><div class="stage"><div id="nav-mount"></div></div></section>
+<aside class="panel"><h2>交互参数</h2>
+<div class="group"><span class="group-title">ICON COLOR / 图标颜色</span><div class="actions"><button data-color="black" class="active" aria-pressed="true">黑色</button><button data-color="white" aria-pressed="false">白色</button></div></div>
+<div class="group"><span class="group-title">MOTION / 点击动画</span><div class="actions"><button id="motion" aria-pressed="true" class="active">动画开启</button></div></div>
+<div class="group"><span class="group-title">PRESS / 按压行为</span><select id="behavior"><option value="rebound">按下后自动弹起</option><option value="hold">按下后保持</option><option value="none">仅播放动画</option></select></div>
+<div class="group" id="delay-group"><span class="group-title">REBOUND DELAY / 弹起延迟</span><label class="range"><span>延迟时间</span><output id="delay-out">360 ms</output><input id="delay" type="range" min="120" max="1500" step="40" value="360"></label></div>
+<div class="group"><span class="group-title">GROUP / 按钮联动</span><select id="group"><option value="exclusive">互斥状态（同一时间一个按钮）</option><option value="independent">独立状态（允许多个按钮）</option></select></div>
+<div class="group"><span class="group-title">TOOLS / 操作</span><div class="actions"><button id="reset">恢复默认</button></div></div>
+<div class="event" id="event"><strong>交互事件</strong><br>点击上方任意一枚按钮，这里会显示它的索引与名称。</div><div class="status" id="status" role="status" aria-live="polite">正在载入 24 枚按钮…</div>
+<div class="info">所有参数只作用于当前实验室预览。这里不会接管网站导航，也不会向宫水.com 提交数据。实验室中的按钮只发送本地选中事件。</div></aside></div>
+<footer class="foot">NAVIGATION INTERACTION SYSTEM · 24 PIXEL MICRO-INTERACTIONS</footer></main>
+<script>
+(()=>{'use strict';
+const BASE='https://gsvegetable.github.io/gongshui-open-source/projects/navigation-interaction/';
+const $=id=>document.getElementById(id);let api=null,config={iconColor:'black',animations:true,clickBehavior:'rebound',reboundDelay:360,groupBehavior:'exclusive'};
+function status(t){$('status').textContent=t}
+function apply(){if(!api)return;config={iconColor:document.querySelector('[data-color].active')?.dataset.color||'black',animations:$('motion').getAttribute('aria-pressed')==='true',clickBehavior:$('behavior').value,reboundDelay:Number($('delay').value),groupBehavior:$('group').value};api.configure(config);$('delay-group').hidden=config.clickBehavior!=='rebound';$('group').disabled=config.clickBehavior==='none';$('delay-out').textContent=config.reboundDelay+' ms';status('参数已应用。点击按钮观察实际反馈。')}
+const slot=$('nav-mount'),script=document.createElement('script');script.src=BASE+'embed.js?v=1.4.2';script.dataset.target='nav-mount';script.dataset.width='100%';script.dataset.height='100%';script.dataset.loading='eager';
+window.addEventListener('gongshui:embed:ready',function ready(e){if(e.detail?.kind!=='navigation-interaction')return;window.removeEventListener('gongshui:embed:ready',ready);api=e.detail.api;api.ready.then(ok=>{if(!ok){status('预览载入失败。');return}api.onSelect(({index,label})=>{$('event').innerHTML='<strong>交互事件</strong><br>样本索引：'+index+'<br>按钮名称：'+label;status('已触发样本 '+(index+1)+' 的点击事件。')});apply();status('24 枚按钮已就绪。')})});
+document.body.appendChild(script);
+document.querySelectorAll('[data-color]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-color]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});apply()}));
+$('motion').addEventListener('click',()=>{const on=$('motion').getAttribute('aria-pressed')!=='true';$('motion').setAttribute('aria-pressed',String(on));$('motion').classList.toggle('active',on);$('motion').textContent=on?'动画开启':'动画关闭';apply()});
+['behavior','delay','group'].forEach(id=>$(id).addEventListener('input',apply));
+$('reset').addEventListener('click',()=>{document.querySelectorAll('[data-color]').forEach(x=>{const active=x.dataset.color==='black';x.classList.toggle('active',active);x.setAttribute('aria-pressed',String(active))});$('motion').setAttribute('aria-pressed','true');$('motion').classList.add('active');$('motion').textContent='动画开启';$('behavior').value='rebound';$('delay').value='360';$('group').value='exclusive';api?.reset();apply();$('event').innerHTML='<strong>交互事件</strong><br>已恢复默认参数。'});
+})();
+</script></body></html>
