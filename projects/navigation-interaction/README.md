@@ -1,6 +1,6 @@
 # Navigation Interaction System / 导航交互系统
 
-Version: **1.2.0**
+Version: **1.4.0**
 
 24 种像素风按钮交互样本。可以一次展示完整样本墙，也可以只取其中一个按钮，或选择任意几个样本组合。它不会接管你的网站路由；按钮点击只向你的代码发送选中事件。
 
@@ -75,6 +75,6 @@ Embed one sample with a single script tag (sample indices are zero-based):
 <script src="https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/embed.js" data-sample="7"></script>
 ```
 
-Embed a subset with `data-samples="0,2,7,14"`, or omit the filter to show all 24 samples. A single-sample embed defaults to a compact 84 × 84 px mount; set `data-width`, `data-height`, or `data-button-size` to customize it. Filtered embeds remove the showcase heading/footer so the buttons work as standalone UI components. Await `api.ready`, use `api.select(index)`, subscribe with `api.onSelect(callback)`, and call `api.reset()` or `api.destroy()` as needed.
+Embed a subset with `data-samples="0,2,7,14"`, or omit the filter to show all 24 samples. A single-sample embed defaults to a compact 84 × 84 px mount; set `data-width`, `data-height`, or `data-button-size` to customize it. Filtered embeds remove the showcase heading/footer so the buttons work as standalone UI components. Await `api.ready`, use `api.select(index)`, subscribe with `api.onSelect(callback)`, and call `api.reset()` or `api.destroy()` as needed. Configuration supports `iconColor`, `animations`, `clickBehavior` (`none`, `hold`, `rebound`), `reboundDelay`, and `groupBehavior` (`independent`, `exclusive`).
 
 The project-level MIT license covers the original component source, sample markup, and authored styles.
