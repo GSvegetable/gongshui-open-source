@@ -1,12 +1,11 @@
 # Changelog
 
-## 1.1.0 — 2026-11-26
+## 1.2.0
+- Add one-line script-only embedding.
+- Add options to hide pins, search, and control/flag buttons independently.
+- Expose a ready promise and document API lifecycle.
+- Clarify standalone reuse and asset/data licensing.
 
-- Added isolated two-line embed loader, public API, and validated events.
-- Removed website i18n, navigation, and portfolio DOM dependencies.
-- Added local Chinese, English, and Japanese UI strings.
-- Made the globe lifecycle project-owned.
-
-## 1.0.0 — 2026-11-26
-
-- First independent release.
+## 1.1.0
+- Independent iframe loader and public API.
+- Remove Gongshui website runtime dependencies.
