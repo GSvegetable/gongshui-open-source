@@ -1,0 +1,402 @@
+/* ============================================================
+   3_sy — 双轨卡片空间
+   视觉语言：纯黑底 + 巨幅幽灵排版 + 双轨实心配色 + 钢蓝斜体副标
+   ============================================================ */
+
+:root {
+  color-scheme: dark;
+  --ink: #001028;
+  --steel: #5a82ae;
+  /* 双轨实心配色：低饱和度暖石 + 冷石，对比柔和、不刺眼 */
+  --rail-front-bg: #f3f0ec;   /* 前轨：暖石白 */
+  --rail-front-edge: #e8e1d6;
+  --rail-back-bg: #232e36;    /* 后轨：冷石灰 */
+  --rail-back-edge: #181e24;
+  --ghost: rgba(255, 255, 255, 0.085);
+  --hair: rgba(255, 255, 255, 0.14);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+body {
+  overscroll-behavior: none;
+  color: #e8eef3;
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  background: #000;
+  perspective: 1400px;
+  perspective-origin: 50% 42%;
+}
+
+/* ------------------------------------------------------------ 幽灵排版 */
+
+.ghost {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ghost-word {
+  position: absolute;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: 0.015em;
+  color: var(--ghost);
+  white-space: nowrap;
+}
+
+.ghost-agent   { left: 1.5%;  top: 11%; font-size: min(6.9vw, 15vh); }
+.ghost-ripple  { left: 50%;   top: 32%; transform: translateX(-50%); font-size: min(8vw, 17vh); letter-spacing: 0.04em; }
+.ghost-water   { left: 1.5%;  top: 60%; font-size: min(8.4vw, 18vh); }
+.ghost-system  { left: 1.5%;  top: 71.5%; font-size: min(6vw, 13vh); letter-spacing: 0.05em; }
+.ghost-ripple-2{ left: 66%;   top: 77%; font-size: min(8vw, 17vh); letter-spacing: 0.04em; }
+
+/* -------------------------------------------------------------- 轨道 */
+
+.rail {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.rail-back  { z-index: 1; }
+.rail-front { z-index: 2; }
+
+/* -------------------------------------------------------------- 卡片 */
+
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--card-w, 150px);
+  height: var(--card-h, 132px);
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  pointer-events: auto;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  /* overflow: hidden;  移除：3D 翻面时会裁切文字 */
+  border-radius: var(--card-radius, 12px);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 前轨（右，奇数）：暖米白实心 */
+.face.front {
+  background: linear-gradient(180deg, var(--rail-front-bg) 0%, var(--rail-front-edge) 100%);
+  box-shadow:
+    0 22px 44px -18px rgba(0, 0, 0, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    inset 0 -16px 28px -20px rgba(0, 0, 0, 0.15);
+}
+
+/* 后轨（左，偶数）：深青灰实心 */
+.face.back {
+  transform: rotateX(180deg);
+  background: linear-gradient(180deg, var(--rail-back-bg) 0%, var(--rail-back-edge) 100%);
+  box-shadow:
+    0 22px 44px -18px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* 瓷器/玻璃效果类 —— 彻底移除 backdrop-filter 和光效渐变，改为实心配色 */
+.face.porcelain {
+  background: linear-gradient(180deg, var(--rail-back-bg) 0%, var(--rail-back-edge) 100%);
+  box-shadow:
+    0 22px 44px -18px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.face.porcelain-back {
+  background: linear-gradient(180deg, var(--rail-back-bg) 0%, var(--rail-back-edge) 100%);
+  box-shadow:
+    0 22px 44px -18px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* 去掉原瓷器类的伪元素光效 */
+.face.porcelain::before,
+.face.porcelain-back::before,
+.face.porcelain::after,
+.face.porcelain-back::after {
+  display: none !important;
+}
+
+/* .cast 渐变层彻底移除：它遮挡卡片顶部 40% 文字区域 */
+/* .cast { display: none; } */
+
+.eyebrow {
+  position: absolute;
+  left: 12%;
+  top: 12.1%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: calc(var(--card-w, 150px) * 0.06);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  color: rgba(0, 0, 0, 0.42);
+  z-index: 10;
+}
+
+.copy {
+  position: absolute;
+  left: 12%;
+  right: 8%;
+  bottom: 12.1%;
+  z-index: 10;
+}
+
+.copy h2 {
+  margin: 0 0 calc(var(--card-h, 132px) * 0.028);
+  font-family: "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", "SimSun", Georgia, "Times New Roman", serif;
+  font-size: calc(var(--card-w, 150px) * 0.173);
+  line-height: 1.08;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #0a0a0a;
+  white-space: nowrap;
+}
+
+.copy p {
+  margin: 0;
+  font-family: "Noto Sans SC", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: calc(var(--card-w, 150px) * 0.06);
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  color: rgba(0, 0, 0, 0.52);
+  white-space: nowrap;
+}
+
+/* 后轨文字颜色适配深色底 + 统一提升文字层级 */
+.face.porcelain .copy h2,
+.face.porcelain-back .back-mark { color: #fffffff0; }
+.face.porcelain .copy p { color: #ffffffb8; }
+.face.porcelain .eyebrow { color: #ffffffad; }
+.face.porcelain .cast { display: none; }
+
+.face.porcelain .eyebrow,
+.face.porcelain .copy,
+.face.front .eyebrow,
+.face.front .copy { z-index: 10; }
+
+.back-mark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: calc(var(--card-w, 150px) * 0.38);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(10, 28, 48, 0.07);
+}
+
+/* 搜索命中高亮 */
+.card.is-highlighted .face {
+  box-shadow:
+    0 26px 52px -20px rgba(0, 0, 0, 0.62),
+    0 0 0 1.5px rgba(122, 196, 214, 0.85),
+    0 0 26px rgba(90, 170, 200, 0.35);
+}
+
+/* ------------------------------------------------------- 上下黑色渐隐：彻底移除，避免 3D 堆叠上下文遮挡文字 */
+/* .stage::before, .stage::after { display: none; } */
+
+/* ------------------------------------------------------------ 卡片文字安全区 */
+/*
+ * 文字保护层：
+ * 卡片本体通过 JS 的 scale() 做整体同比例缩放，文字会随卡片一起缩放。
+ * 这里额外限制每个文字区域的可用宽度，避免长标题/副标题突破卡片边界。
+ * 不给 .face 设置 overflow:hidden，避免破坏 3D 翻面。
+ */
+
+.eyebrow {
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy {
+  left: 12%;
+  right: 8%;
+  /* 只使用左右留白形成的真实内容宽度，不再额外压缩 80%，避免文字区被二次缩窄 */
+  overflow: hidden;
+}
+
+.copy h2,
+.copy p {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy h2 {
+  /* 标题字号仍由卡片基准尺寸决定，并随外层 scale() 同步缩放。 */
+  font-size: calc(var(--card-w, 150px) * 0.173);
+}
+
+.copy p {
+  /* 副标题同样随卡片整体缩放，不允许突破安全区。 */
+  font-size: calc(var(--card-w, 150px) * 0.06);
+}
+
+/* ------------------------------------------------------------ 状态字 */
+
+.status {
+  position: absolute;
+  left: 18px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 30;
+  pointer-events: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ------------------------------------------------------------ 搜索坞 */
+
+.search-dock {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-toggle {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hair);
+  border-radius: 3px;
+  background: rgba(8, 12, 16, 0.55);
+  color: rgba(216, 232, 240, 0.72);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.search-toggle:hover,
+.search-toggle:focus-visible {
+  border-color: rgba(122, 178, 196, 0.55);
+  color: #eaf3f7;
+  outline: none;
+}
+
+.search-input {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  padding: 0;
+  border: 1px solid rgba(110, 159, 163, 0.28);
+  border-radius: 3px;
+  background: rgba(6, 9, 12, 0.86);
+  color: #dfe9ef;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  outline: none;
+  transition: width 0.26s cubic-bezier(0.22, 0.8, 0.2, 1), opacity 0.18s ease, padding 0.26s ease;
+}
+
+.search-input.open {
+  width: 208px;
+  opacity: 1;
+  pointer-events: auto;
+  padding: 9px 11px;
+}
+
+.search-input::placeholder { color: rgba(210, 225, 225, 0.32); }
+.search-input::-webkit-search-cancel-button { filter: invert(0.7); opacity: 0.45; }
+
+@media (prefers-reduced-motion: reduce) {
+  .search-input { transition: opacity 0.12s ease; }
+}
+
+/* ------------------------------------------------------------ 倾斜层层级修正 */
+
+.stage { perspective: none; }
+.tilt-layer { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.rail-back { z-index: 3; }
+.rail-front { z-index: 2; }
+.card .face { opacity: var(--card-alpha, 1); }
+.card.is-reflowing { transition: transform 0.39s cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* 点击反馈：先轻轻“吸起”，再进入原有翻面弹簧。
+   不改变卡片内容，只给用户一个清晰的触点反馈。 */
+.card.is-highlighted {
+  filter: brightness(calc(1 + var(--focus-pulse, 0) * 0.035));
+}
+
+.card.is-highlighted .inner {
+  filter: drop-shadow(
+    0 calc(8px + var(--focus-pulse, 0) * 7px)
+    calc(18px + var(--focus-pulse, 0) * 10px)
+    rgba(120, 185, 205, calc(0.16 + var(--focus-pulse, 0) * 0.08))
+  );
+}
+
+.card.is-highlighted .face {
+  box-shadow:
+    0 22px 44px -18px rgba(0, 0, 0, 0.58),
+    0 0 calc(8px + var(--focus-pulse, 0) * 10px)
+      rgba(150, 210, 225, calc(0.08 + var(--focus-pulse, 0) * 0.07)),
+    inset 0 0 0 1px rgba(255, 255, 255, calc(0.38 + var(--focus-pulse, 0) * 0.16));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.is-highlighted .inner,
+  .card.is-highlighted .face {
+    filter: none;
+  }
+}

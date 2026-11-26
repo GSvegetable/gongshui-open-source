@@ -1,0 +1,29 @@
+/* ============================================================
+   嵌入模式（?embed=1）
+   作品被放进宫水.com 首页的作品网格底下，当成一层背景空间：
+   底色要让出来，作品自带的搜索框与状态标签也会和宿主导航打架，
+   所以嵌入时一律隐藏 —— 宿主页面自己有一套导航。
+   ============================================================ */
+
+html.sy-embed,
+html.sy-embed body,
+html.sy-embed #app {
+  background: transparent;
+}
+
+/* 独立版用 overscroll-behavior: none 防止滚出作品自己的边界；
+   嵌入时这会把宿主页面的滚动也一起锁掉，所以放开。 */
+html.sy-embed body {
+  overscroll-behavior: auto;
+}
+
+html.sy-embed .stage {
+  background: transparent;
+  /* 嵌入时纵向滑动留给宿主页面滚动，横向仍然归作品（左右切换）。 */
+  touch-action: pan-y;
+}
+
+html.sy-embed .search-dock,
+html.sy-embed .status {
+  display: none;
+}

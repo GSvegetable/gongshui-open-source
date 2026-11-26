@@ -1,0 +1,170 @@
+/* 双轨纯色方案：左侧大轨在上，右侧小轨在下。 */
+.stage{perspective:none}
+.tilt-layer{position:absolute;inset:0;z-index:1;pointer-events:none}
+.rail-back{z-index:3}
+.rail-front{z-index:2}
+
+/* 大轨道：冷石灰（低饱和度）。 */
+.face.porcelain,.face.porcelain-back{
+ position:absolute;
+ /* overflow:hidden; 移除：3D 翻面时会裁切文字 */
+ border:0;
+ border-radius:calc(var(--card-radius,12px)*1.5);
+ background:#232e36;
+ box-shadow:none;
+ -webkit-backdrop-filter:none;
+ backdrop-filter:none;
+ }
+.face.porcelain-back{background:#232e36}
+
+/* 小轨道：暖石白（低饱和度）。 */
+.face.front:not(.porcelain),.face.back:not(.porcelain-back){
+ background:#f3f0ec;
+ box-shadow:none;
+ }
+.face.front .cast,.face.back .cast,
+.face.porcelain .cast,.face.porcelain-back .cast{display:none}
+.face.porcelain::before,.face.porcelain::after,
+.face.porcelain-back::before,.face.porcelain-back::after{content:none}
+
+/* 纯色卡面使用清晰、高对比度文字。 */
+.face.porcelain>.eyebrow,.face.porcelain>.copy,
+.face.porcelain-back>.back-mark{z-index:10}
+.face.porcelain .eyebrow{
+ left:10.7%;
+ top:auto;
+ bottom:calc(var(--card-h,132px)*.405);
+ font-size:calc(var(--card-w,150px)*.053);
+ letter-spacing:.22em;
+ color:#FFFFFF;
+ text-shadow:none;
+ }
+.face.porcelain .copy{left:10.7%;right:8%;bottom:9.1%}
+.face.porcelain .copy h2{
+ font-size:calc(var(--card-w,150px)*.147);
+ letter-spacing:-.03em;
+ color:#FFFFFF;
+ text-shadow:none;
+ }
+.face.porcelain .copy p{
+ font-family:"Noto Sans SC",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ font-style:normal;
+ font-weight:500;
+ font-size:calc(var(--card-w,150px)*.06);
+ letter-spacing:.04em;
+ color:rgba(255,255,255,.88);
+ text-shadow:none;
+ }
+.face.porcelain-back .back-mark{color:rgba(255,255,255,.22);text-shadow:none}
+
+/* 前轨文字也提升层级，防止被遮挡 */
+.face.front:not(.porcelain) .eyebrow,
+.face.front:not(.porcelain) .copy { z-index: 10; }
+.face.front:not(.porcelain) .eyebrow{color:rgba(25,35,55,.58);text-shadow:none}
+.face.front:not(.porcelain) .copy h2{color:#18243D;text-shadow:none}
+.face.front:not(.porcelain) .copy p{color:rgba(24,36,61,.72);text-shadow:none}
+.face.back:not(.porcelain-back) .back-mark{color:rgba(24,36,61,.22)}
+
+.card .face{opacity:var(--card-alpha,1)}
+.card.is-reflowing{transition:transform 390ms cubic-bezier(.22,1,.36,1)}
+
+/* 前轨位于后轨右侧，但两轨横向重叠约 30px（含缩放）。
+   将前轨文字整体向右收进可见区域，避免被上层深色卡片盖住首字。 */
+.face.front:not(.porcelain) .eyebrow,
+.face.front:not(.porcelain) .copy {
+  left: 22%;
+}
+
+/* ============================================================
+   修复「文字随机消失 / 被斜切」（根因：跨卡片共享同一个 3D 渲染上下文）
+
+   原来 .rail 和 .card 都是 transform-style: preserve-3d，
+   所有卡片（以及左右两条轨道上的卡片）被放进同一个 3D 场景里，
+   浏览器改按「空间深度」而不是 z-index 来排序。
+   而每张卡的 .inner 又带着 rotateY(-8deg) / rotateX(翻面角)，
+   相邻卡片的平面互相穿插 → 渲染器把它们切成碎片：
+   有的标题被邻居的底色盖住，有的被对角线切掉一半。
+   滑动、切换三个状态时角度/位置在变，穿插关系也跟着变，所以表现为不固定。
+
+   解决：只让每张卡自己的 .inner 保留 3D（翻面需要），
+   轨道和卡片本身压平，卡片之间回到普通的 z-index 叠放。
+   ============================================================ */
+.stage .rail,
+.stage .card {
+  transform-style: flat;
+  -webkit-transform-style: flat;
+}
+
+/* 每张卡一个独立的叠放/绘制上下文，互不影响 */
+.stage .card {
+  isolation: isolate;
+  contain: layout style;
+}
+
+/* 文字抗锯齿统一，缩放中的边缘更稳 */
+.stage .card .face {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================================
+   同轨卡片分层：同一条轨道的卡片颜色相同、又相互叠压，
+   原来没有投影，边缘融在一起。这里给每张卡
+   ① 竖向渐变（顶亮底暗）② 顶部高光线 + 发丝描边 ③ 向下投射的阴影，
+   上面的卡片会在下一张卡的顶部投下阴影，叠压关系一眼可辨。
+   ============================================================ */
+
+/* 深色轨（左 / 大轨） */
+.stage .card .face.porcelain,
+.stage .card .face.porcelain-back {
+  background: linear-gradient(180deg, #2f3c46 0%, #25313a 50%, #1c252c 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 18px 22px -10px rgba(0, 0, 0, 0.8),
+    0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* 浅色轨（右 / 小轨） */
+.stage .card .face.front:not(.porcelain),
+.stage .card .face.back:not(.porcelain-back) {
+  background: linear-gradient(180deg, #faf8f4 0%, #f2efea 50%, #e3ddd3 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 0 1px rgba(40, 50, 70, 0.07),
+    0 18px 22px -10px rgba(8, 14, 26, 0.6),
+    0 3px 6px rgba(8, 14, 26, 0.28);
+}
+
+/* 搜索命中高亮（放在最后，保证压过上面的阴影） */
+.stage .card.is-highlighted .face.front,
+.stage .card.is-highlighted .face.back {
+  box-shadow:
+    0 18px 22px -10px rgba(0, 0, 0, 0.7),
+    0 0 0 1.5px rgba(122, 196, 214, 0.85),
+    0 0 26px rgba(90, 170, 200, 0.35);
+}
+
+/* ============================================================
+   翻面时的地面投影：卡片被拿起时（--lift 由 scene.js 写入，0~1），
+   在卡片下方投一块不随翻转旋转的柔和阴影，越高越大越淡，
+   落下时收回去。只对悬空中的卡片启用，避免给所有卡片加滤镜。
+   ============================================================ */
+.stage .card::after {
+  content: none;
+}
+.stage .card.is-lifted::after {
+  content: "";
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 14%;
+  bottom: -4%;
+  z-index: -1;
+  border-radius: calc(var(--card-radius, 12px) * 1.6);
+  background: rgba(0, 0, 0, 0.62);
+  filter: blur(calc(8px + var(--lift, 0) * 16px));
+  opacity: calc(var(--lift, 0) * 0.85);
+  transform: translateY(calc(var(--lift, 0) * 26px)) scale(calc(1 - var(--lift, 0) * 0.04));
+  pointer-events: none;
+}

@@ -9,6 +9,7 @@ on:
       - "projects/contributors-globe/**"
       - "projects/bookmark-hall/**"
       - "projects/navigation-interaction/**"
+      - "projects/3-sy/**"
       - ".github/workflows/deploy-project-sites.yml"
   workflow_dispatch:
 
@@ -31,6 +32,19 @@ jobs:
       - name: Check out monorepo
         uses: actions/checkout@v4
 
+      - name: Set up Node for the 3_sy build
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: projects/3-sy/package-lock.json
+
+      - name: Build 3_sy
+        working-directory: projects/3-sy
+        run: |
+          npm ci
+          npm run build
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
@@ -39,12 +53,13 @@ jobs:
       - name: Assemble all project sites
         run: |
           rm -rf _site
-          mkdir -p _site/pixel-daylight-switch _site/contributors-globe _site/bookmark-hall _site/navigation-interaction
+          mkdir -p _site/pixel-daylight-switch _site/contributors-globe _site/bookmark-hall _site/navigation-interaction _site/3-sy
           cp -a projects/pixel-orbit/. _site/
           cp -a projects/pixel-daylight-switch/. _site/pixel-daylight-switch/
           cp -a projects/contributors-globe/. _site/contributors-globe/
           cp -a projects/bookmark-hall/. _site/bookmark-hall/
           cp -a projects/navigation-interaction/. _site/navigation-interaction/
+          cp -a projects/3-sy/dist/. _site/3-sy/
           touch _site/.nojekyll
 
       - name: Verify standalone entry points
@@ -58,6 +73,8 @@ jobs:
           test -s _site/contributors-globe/assets/earth/earth-night.jpg
           test -s _site/contributors-globe/assets/earth/earth-topology.png
           test -s _site/contributors-globe/assets/earth/night-sky.jpg
+          test -s _site/3-sy/index.html
+          test -n "$(ls _site/3-sy/assets/*.js 2>/dev/null)"
 
       - name: Upload consolidated site
         uses: actions/upload-pages-artifact@v3
