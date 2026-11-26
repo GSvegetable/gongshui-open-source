@@ -56,7 +56,7 @@
   const frameUrl = new URL('index.html', baseUrl);
   frameUrl.searchParams.set('embed', '1');
   // Force a fresh document when the showcase markup changes; CSS-only cache busts are not enough.
-  frameUrl.searchParams.set('v', script.getAttribute('data-version') || '1.1.3');
+  frameUrl.searchParams.set('v', script.getAttribute('data-version') || '1.2.0');
   const initialLanguage = script.getAttribute('data-lang') || document.documentElement.lang;
   if (initialLanguage) frameUrl.searchParams.set('lang', initialLanguage);
   ['sample', 'samples', 'columns', 'gap', 'button-size'].forEach(key => {
@@ -118,6 +118,11 @@
     },
     reset() {
       send({ type: 'gongshui:navigation-interaction:reset' });
+    },
+    setIconColor(color) {
+      const normalized = String(color || '').toLowerCase() === 'white' ? 'white' : 'black';
+      send({ type: 'gongshui:navigation-interaction:icon-color', color: normalized });
+      return normalized;
     },
     onSelect(listener) {
       if (typeof listener !== 'function') return () => {};

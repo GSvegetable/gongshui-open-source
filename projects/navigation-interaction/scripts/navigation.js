@@ -31,6 +31,11 @@
   })();
 
   let selectedIndex = -1;
+  function setIconColor(color) {
+    if (showcase) showcase.classList.toggle('is-icon-white', color === 'white');
+    return color === 'white' ? 'white' : 'black';
+  }
+  setIconColor('black');
 
   function applySelection(index, notifyParent) {
     const nextIndex = Number(index);
@@ -72,6 +77,10 @@
     if (window.parent === window || !parentOrigin || event.source !== window.parent || event.origin !== parentOrigin) return;
     const message = event.data;
     if (!message || typeof message !== 'object') return;
+    if (message.type === 'gongshui:navigation-interaction:icon-color') {
+      setIconColor(message.color);
+      return;
+    }
     if (message.type === 'gongshui:navigation-interaction:reset') {
       resetSelection();
       return;
@@ -85,6 +94,7 @@
 
   window.NavigationInteraction = {
     select: index => applySelection(index, true),
+    setIconColor,
     reset: resetSelection,
     get selectedIndex() { return selectedIndex; },
     get count() { return allButtons.length; },
