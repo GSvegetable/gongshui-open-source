@@ -48,6 +48,10 @@
   frameUrl.searchParams.set('embed', '1');
   const initialLanguage = script.getAttribute('data-lang') || document.documentElement.lang;
   if (initialLanguage) frameUrl.searchParams.set('lang', initialLanguage);
+  ['sample', 'samples', 'columns', 'gap'].forEach(key => {
+    const value = script.getAttribute('data-' + key);
+    if (value !== null) frameUrl.searchParams.set(key, value);
+  });
 
   const frame = document.createElement('iframe');
   frame.src = frameUrl.href;
@@ -64,6 +68,8 @@
   const pendingMessages = [];
   let frameReady = false;
   let destroyed = false;
+  let resolveReady;
+  const ready = new Promise(resolve => { resolveReady = resolve; });
 
   const send = message => {
     if (destroyed || !message || !frame.contentWindow) return;
@@ -73,6 +79,7 @@
 
   const onFrameLoad = () => {
     frameReady = true;
+    resolveReady(true);
     while (pendingMessages.length) frame.contentWindow.postMessage(pendingMessages.shift(), frameOrigin);
   };
 
@@ -90,12 +97,16 @@
   const api = {
     element: slot,
     iframe: frame,
+    ready,
     select: function (index) {
       send({ type: 'gongshui:navigation-interaction:select', index: Number(index) });
     },
     setLanguage(language) {
       const lang = String(language || '').trim();
       if (lang) send({ type: 'gongshui:embed:language', lang });
+    },
+    reset() {
+      send({ type: 'gongshui:navigation-interaction:reset' });
     },
     onSelect(listener) {
       if (typeof listener !== 'function') return () => {};
@@ -105,6 +116,7 @@
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      resolveReady(false);
       listeners.clear();
       pendingMessages.length = 0;
       languageObserver.disconnect();

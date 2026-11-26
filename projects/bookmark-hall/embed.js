@@ -48,6 +48,10 @@
   frameUrl.searchParams.set('embed', '1');
   const initialLanguage = script.getAttribute('data-lang') || document.documentElement.lang;
   if (initialLanguage) frameUrl.searchParams.set('lang', initialLanguage);
+  ['icons', 'controls', 'max-items'].forEach(key => {
+    const value = script.getAttribute('data-' + key);
+    if (value !== null) frameUrl.searchParams.set(key, value);
+  });
 
   const frame = document.createElement('iframe');
   frame.src = frameUrl.href;
@@ -64,6 +68,8 @@
   const pendingMessages = [];
   let frameReady = false;
   let destroyed = false;
+  let resolveReady;
+  const ready = new Promise(resolve => { resolveReady = resolve; });
 
   const send = message => {
     if (destroyed || !message || !frame.contentWindow) return;
@@ -73,6 +79,7 @@
 
   const onFrameLoad = () => {
     frameReady = true;
+    resolveReady(true);
     while (pendingMessages.length) frame.contentWindow.postMessage(pendingMessages.shift(), frameOrigin);
   };
 
@@ -90,8 +97,16 @@
   const api = {
     element: slot,
     iframe: frame,
+    ready,
     setItems: function (items) {
-      if (Array.isArray(items)) send({ type: 'gongshui:bookmark-hall:data', items: items.slice(0, 300) });
+      if (!Array.isArray(items)) return false;
+      send({ type: 'gongshui:bookmark-hall:data', items: items.slice(0, 300) });
+      return true;
+    },
+    controls: {
+      advance: delta => send({ type: 'gongshui:bookmark-hall:control', action: 'advance', delta: Number(delta) || 1 }),
+      back: () => send({ type: 'gongshui:bookmark-hall:control', action: 'back' }),
+      openCurrent: () => send({ type: 'gongshui:bookmark-hall:control', action: 'openCurrent' })
     },
     setLanguage(language) {
       const lang = String(language || '').trim();
@@ -105,6 +120,7 @@
     destroy() {
       if (destroyed) return;
       destroyed = true;
+      resolveReady(false);
       listeners.clear();
       pendingMessages.length = 0;
       languageObserver.disconnect();

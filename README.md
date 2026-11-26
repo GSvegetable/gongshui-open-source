@@ -1,6 +1,6 @@
 # Gongshui Independent Projects
 
-The source-of-truth monorepo for the independent interactive works shown on [Gongshui.com](https://xn--3bts89a.com/). The website repository is the platform shell; this repository owns the works.
+宫水.com 独立交互作品与可复用 UI 组件的源码仓库。网站仓库负责平台 UI、账号、路由和数据持久化；本仓库负责作品本身、组件 API、素材、文档、测试与版本。
 
 ## Projects
 
@@ -8,29 +8,24 @@ The source-of-truth monorepo for the independent interactive works shown on [Gon
 |---|---|---|---|---|
 | 1 | Pixel Daylight Switch | [Source](projects/pixel-daylight-switch/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/pixel-daylight-switch/preview.html) | 3.1.1 |
 | 2 | Pixel Orbit | [Source](projects/pixel-orbit/) | [Showcase](https://gsvegetable.github.io/gongshui-open-source/showcase.html) | 1.2.3 |
-| 3 | Contributors Globe / 投稿者地球 | [Source](projects/contributors-globe/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/contributors-globe/) | 1.1.0 |
-| 4 | The Bookmark Hall / 收藏长廊 | [Source](projects/bookmark-hall/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/) | 1.1.0 |
-| 5 | Navigation Interaction System / 导航交互系统 | [Source](projects/navigation-interaction/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/) | 1.1.0 |
+| 3 | Contributors Globe / 投稿者地球 | [Source](projects/contributors-globe/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/contributors-globe/) | 1.2.0 |
+| 4 | The Bookmark Hall / 收藏长廊 | [Source](projects/bookmark-hall/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/) | 1.2.0 |
+| 5 | Navigation Interaction System / 导航交互系统 | [Source](projects/navigation-interaction/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/) | 1.2.0 |
+
+## 作为 UI 组件使用
+
+项目 3–5 不只是独立网页：支持 script-only 一行嵌入、可选容器、独立 API、单项/多项筛选和宿主数据注入。
+
+- [完整嵌入与 API 指南](docs/EMBEDDING.md)
+- [投稿者地球](projects/contributors-globe/README.md)：可以只嵌入干净地球，不显示投稿者旗帜、搜索和控制图标。
+- [收藏长廊](projects/bookmark-hall/README.md)：传入你自己的数组，支持一件或多件收藏，不依赖本站账号。
+- [导航交互系统](projects/navigation-interaction/README.md)：24 个按钮可按索引单独取用，也可组合展示。
 
 ## Architecture
 
-- `gongshui-pages`: website UI, routing, login/account, bookmark persistence, search, settings, catalog and host adapters.
-- `gongshui-open-source`: independent work implementations, assets, data, docs, tests, versions and deployment.
+- `gongshui-pages`: 网站 UI、导航、登录账号、收藏持久化、搜索、设置、作品目录和宿主适配。
+- `gongshui-open-source`: 独立作品实现、公开组件 API、素材、数据、文档、版本和部署。
 
-The website can embed a work and pass public data to it, but must not own a duplicate renderer or expose its private application state. See [Repository guide](docs/REPOSITORY-GUIDE.md) and [migration status](docs/MIGRATION-STATUS.md).
+## Licensing
 
-## Embedding
-
-Projects 3–5 now provide isolated two-line `embed.js` loaders and documented APIs. See [Embed API guide](docs/EMBEDDING.md).
-
-## Terms
-
-There is no blanket license for this monorepo. Pixel Daylight Switch uses Unlicense; Pixel Orbit has no license specified and remains copyrighted by its author. The extracted projects retain the original author's rights and the terms of their third-party dependencies. Check each project's README and dependency notices before reuse or redistribution.
-
-## 中文说明
-
-这是宫水.com 五个独立作品的源码主仓库。网站仓库只负责平台本身，包括 UI、登录、账号、收藏数据、搜索、设置和作品目录；本仓库负责五个作品的实现、素材、数据、文档和版本。
-
-五个作品均有独立入口。第三至第五个作品现已补齐隔离式 `embed.js` 加载器、公开 API 和来源校验的事件通信；收藏长廊只接收宿主传入的数据，地球不再读取网站全局或作品卡片 DOM，导航交互系统不接管网站真实路由。
-
-没有全仓库通用许可证。请分别查看各作品的使用条款和第三方依赖许可证。
+没有全仓库统一许可证。项目 1–2 保留各自现有条款；项目 3–5 的原创源代码分别采用 MIT，第三方依赖、媒体、数据和投稿者内容遵循各自条款。

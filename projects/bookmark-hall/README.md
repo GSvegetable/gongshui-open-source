@@ -1,24 +1,90 @@
 # The Bookmark Hall / 收藏长廊
 
-Version: **1.1.0**
+Version: **1.2.0**
 
-A procedural pixel-art palace corridor rendered with Canvas 2D. The visual experience is standalone; bookmark records arrive through a public data contract. The project never reads host website state or storage.
+一座由数据驱动的像素风 3D 收藏长廊。它不连接任何特定网站账号，也不读取宿主 localStorage。收藏数据由你自己的页面传入，因此你可以展示 1 件、3 件、4 件，或一整组收藏。
 
-## Run independently
+## 最快开始：一行代码
 
-Serve this directory over HTTP and open `index.html`. With no data, the corridor shows its designed empty state.
+先放入脚本即可自动创建长廊容器：
 
-## Embed in any website
+```html
+<script src="https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/embed.js" data-icons="0"></script>
+```
 
-    <div data-bookmark-hall-embed></div>
-    <script src="https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/embed.js"></script>
+如果需要指定尺寸：
 
-    const hall = document.querySelector('[data-gongshui-embed="bookmark-hall"]').gongshuiEmbed;
-    hall.setItems([{ id: 'pixel-orbit', title: 'Pixel Orbit', folder: 'Worlds' }]);
-    hall.onOpen(({ id }) => console.log('Open work:', id));
+```html
+<div id="my-hall" style="width:100%;height:520px"></div>
+<script src="https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/embed.js" data-target="my-hall" data-icons="0"></script>
+```
 
-Optional attributes: `data-target`, `data-width`, `data-height`, `data-ratio`, `data-min-height`, `data-label`, `data-lang`, and `data-loading`.
+## 把你的收藏传进去
 
-Each item supports `id` (required), `title`, `en`, `desc`, `github`, `src`, `ratio`, and `folder`. URLs are sanitized and input is capped at 300 records. The host owns authentication, persistence, folder ordering, synchronization, and navigation.
+```js
+const hall = document.querySelector('[data-gongshui-embed="bookmark-hall"]').gongshuiEmbed;
+await hall.ready;
 
-Host → work: `gongshui:bookmark-hall:data`; work → host: `gongshui:bookmark-hall:open`. Incoming messages require the actual parent window and exact referrer origin; the loader validates iframe source and origin.
+hall.setItems([
+  { id: 'work-a', title: '我的第一个作品', desc: '作品简介', src: 'https://example.com/work-a', ratio: 1.6 },
+  { id: 'work-b', title: '我的第二个作品', src: 'https://example.com/work-b' },
+  { id: 'work-c', title: '我的第三个作品', github: 'https://github.com/example/work-c' }
+]);
+
+hall.onOpen(({ id }) => {
+  // 由你的网站决定打开详情、路由或弹窗
+  console.log('打开收藏：', id);
+});
+```
+
+只想展示一个收藏，就传一个对象组成的数组：
+
+```js
+hall.setItems([{ id: 'only-one', title: '唯一收藏', src: 'https://example.com' }]);
+```
+
+更新数据时再次调用 `setItems(nextItems)` 即可。默认最多接收 300 条，可通过 `data-max-items="100"` 降低，上限 300。传入空数组会显示空状态。
+
+## 数据字段
+
+| 字段 | 必需 | 说明 |
+|---|---:|---|
+| `id` | 是 | 稳定且唯一的标识 |
+| `title` | 是 | 展示标题 |
+| `en` | 否 | 英文标题 |
+| `desc` | 否 | 简介 |
+| `src` | 否 | 点击画框后打开的网页地址，支持 HTTPS、相对路径 |
+| `github` | 否 | GitHub 项目地址（HTTPS） |
+| `ratio` | 否 | 详情预览宽高比，默认 1.6439 |
+| `folder` | 否 | 分组标识 |
+
+## 配置
+
+| 属性 | 默认值 | 作用 |
+|---|---:|---|
+| `data-icons` | `1` | `0` 隐藏返回/关闭按钮中的图标，保留必要交互 |
+| `data-controls` | `1` | `0` 隐藏整组 HUD 控件 |
+| `data-max-items` | `300` | 收藏数量上限，最大 300 |
+| `data-width` | `100%` | 容器宽度 |
+| `data-height` | 自动 | 指定容器高度 |
+| `data-ratio` | `1.6439` | 自动高度时的宽高比 |
+| `data-lang` | 页面语言 | `zh`、`en`、`ja` |
+
+## API
+
+```js
+await hall.ready;
+hall.setItems(items);
+hall.setLanguage('ja');
+hall.onOpen(({ id }) => console.log(id));
+hall.controls.advance(1);
+hall.controls.back();
+hall.controls.openCurrent();
+hall.destroy();
+```
+
+`setItems` 接受普通 JavaScript 数组，不要求接入任何特定后端。账号、同步、收藏夹、权限和持久化都由集成方决定。
+
+## 许可
+
+本目录的原创源代码按本目录 `LICENSE`（MIT）授权。MIT 不代表替第三方网站内容、用户提交作品或第三方素材授予权利；请确保你有权展示自己传入的收藏内容。
