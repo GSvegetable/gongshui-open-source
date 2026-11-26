@@ -510,6 +510,7 @@
   let world = null;
   let signature = '';
   let running = false;
+  let embedReady = false;
   let raf = 0;
   let lastT = 0;
   let iw = 0, ih = 0, P = 3, cssW = 1, cssH = 1;
@@ -1277,10 +1278,15 @@
   window.addEventListener('resize', () => { if (running) resize(); });
   // Accept host data only from the actual parent and its exact referrer origin.
   const parentOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
+  const announceEmbedReady = () => {
+    if (window.parent === window || !parentOrigin || !embedReady) return;
+    window.parent.postMessage({ type: 'gongshui:bookmark-hall:ready' }, parentOrigin);
+  };
   window.addEventListener('message', event => {
     if (window.parent === window || !parentOrigin || event.source !== window.parent || event.origin !== parentOrigin) return;
     const msg = event.data;
     if (!msg || typeof msg !== 'object') return;
+    if (msg.type === 'gongshui:embed:ping') { announceEmbedReady(); return; }
     if (msg.type === 'gongshui:embed:language' && typeof msg.lang === 'string') {
       const language = msg.lang.slice(0, 16);
       const url = new URL(window.location.href);
@@ -1316,4 +1322,10 @@
   window.addEventListener('languagechange', () => { hudKey = ''; if (running && world) updateHud(true); });
 
   sync();
+  if (window.parent !== window && parentOrigin) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      embedReady = true;
+      announceEmbedReady();
+    }));
+  }
 })();
