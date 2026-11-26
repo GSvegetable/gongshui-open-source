@@ -53,6 +53,9 @@
     if (value !== null) frameUrl.searchParams.set(key, value);
   });
 
+  const submitUrl = script.getAttribute('data-submit-url');
+  if (submitUrl && /^https:\/\//i.test(submitUrl)) frameUrl.searchParams.set('submit', submitUrl);
+
   const frame = document.createElement('iframe');
   frame.src = frameUrl.href;
   frame.title = script.getAttribute('data-label') || 'Contributors Globe';
