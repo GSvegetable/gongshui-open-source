@@ -56,7 +56,7 @@
   const frameUrl = new URL('index.html', baseUrl);
   frameUrl.searchParams.set('embed', '1');
   // Force a fresh document when the showcase markup changes; CSS-only cache busts are not enough.
-  frameUrl.searchParams.set('v', script.getAttribute('data-version') || '1.4.1');
+  frameUrl.searchParams.set('v', script.getAttribute('data-version') || '1.4.2');
   const initialLanguage = script.getAttribute('data-lang') || document.documentElement.lang;
   if (initialLanguage) frameUrl.searchParams.set('lang', initialLanguage);
   ['sample', 'samples', 'columns', 'gap', 'button-size'].forEach(key => {
@@ -72,8 +72,6 @@
   frame.allow = 'fullscreen; accelerometer; gyroscope';
   frame.setAttribute('allowfullscreen', '');
   frame.style.cssText = 'display:block;width:100%;height:100%;border:0;margin:0;padding:0;background:transparent;';
-  slot.replaceChildren(frame);
-
   const frameOrigin = new URL(frame.src).origin;
   const listeners = new Set();
   const pendingMessages = [];
@@ -102,8 +100,12 @@
     slot.dispatchEvent(new CustomEvent('gongshui:navigation-interaction:select', { detail: message }));
   };
 
+  // Attach lifecycle listeners before inserting the iframe. Otherwise a fast
+  // cached load can fire before the listener exists, leaving every config
+  // message queued forever.
   frame.addEventListener('load', onFrameLoad);
   window.addEventListener('message', onWindowMessage);
+  slot.replaceChildren(frame);
 
   const api = {
     element: slot,
