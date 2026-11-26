@@ -1,6 +1,6 @@
 # Pixel Orbit
 
-**Current project version: v1.2.3** · Updated 2026-11-13
+**Current project version: v1.2.4** · Updated 2026-11-27
 
 [![Quality checks](https://github.com/GSvegetable/gongshui-open-source/actions/workflows/pixel-orbit-quality.yml/badge.svg)](https://github.com/GSvegetable/gongshui-open-source/actions/workflows/pixel-orbit-quality.yml)
 

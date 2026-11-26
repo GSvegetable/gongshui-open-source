@@ -21,7 +21,7 @@
 
   var BASE = 'https://gsvegetable.github.io/gongshui-open-source/';
   // showcase.html 改了就把这个版本号往上加一位；作品页自己的版本由 showcase.html 取 ETag 决定
-  var SHOWCASE_VERSION = '1.2.3';
+  var SHOWCASE_VERSION = '1.2.4';
   var SCENES = ['countryside', 'planet', 'world'];
 
   var script = document.currentScript;

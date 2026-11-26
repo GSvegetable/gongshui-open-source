@@ -108,12 +108,22 @@ for (const apiMethod of ['setHour(18)', 'setAutoplay(48)', 'getHour()', 'isNight
 }
 
 const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
-assert.ok(readme.includes('actions/workflows/quality.yml/badge.svg'), 'README must expose the quality workflow badge');
-for (const relativePath of ['https://gsvegetable.github.io/-pixel-orbit/play.html','https://gsvegetable.github.io/-pixel-orbit/pixel-orbit.html', 'https://gsvegetable.github.io/-pixel-orbit/lab.html', './docs/DEVELOPMENT.md', './CHANGELOG.md']) {
+assert.ok(readme.includes('actions/workflows/pixel-orbit-quality.yml/badge.svg'), 'README must expose the quality workflow badge');
+for (const relativePath of ['https://gsvegetable.github.io/gongshui-open-source/play.html','https://gsvegetable.github.io/gongshui-open-source/pixel-orbit.html', 'https://gsvegetable.github.io/gongshui-open-source/lab.html', './docs/DEVELOPMENT.md', './CHANGELOG.md']) {
   assert.ok(readme.includes(relativePath), `README navigation is missing: ${relativePath}`);
 }
 assert.ok(readme.includes('node tests/smoke.mjs'), 'README must document the executable local quality check');
-assert.ok(readme.includes('https://gsvegetable.github.io/-pixel-orbit/pixel-orbit-planet.html'), 'README must link to the alternate visual edition on GitHub Pages');
+assert.ok(readme.includes('https://gsvegetable.github.io/gongshui-open-source/pixel-orbit-planet.html'), 'README must link to the alternate visual edition on GitHub Pages');
+
+// The clock output must be closed with a real end tag. A malformed `</o>`
+// makes the browser treat the closing tag as unknown and keep <output> open,
+// so the control buttons end up nested inside it — and the clock's
+// textContent write then deletes them, leaving `btn-day` null.
+assert.ok(!planetHtml.includes('</o>'), 'planet edition must not contain a malformed </o> end tag');
+assert.ok(planetHtml.includes('<output id="clock" aria-live="off"></output>'), 'planet edition must close the clock output element properly');
+for (const controlId of ['btn-day', 'btn-night', 'btn-auto', 'btn-now']) {
+  assert.ok(planetHtml.includes(`id="${controlId}"`), `planet edition is missing the ${controlId} control`);
+}
 
 console.log(`Pixel Orbit smoke checks passed (${scripts.length} inline scripts parsed; renderer, controls, lifecycle, entry point, lab and README verified).`);
 

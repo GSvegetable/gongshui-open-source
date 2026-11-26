@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.4 — 2026-11-27
+
+### Fixed
+- 修复星球版页面的时钟输出标签闭合错误：`<output id="clock" aria-live="off"></o>` 少写了 `utput`，浏览器把这个结束标签当作未知标签忽略，`<output>` 因此一直没有闭合。
+  后果是 `.row` 按钮组、`.hint` 与 `<noscript>` 全被解析成 `<output>` 的子节点；页面胶水代码再用 `clock.textContent = ...` 写时钟时，会把 `<output>` 的子节点整体清空——「☀ 白天 / ☾ 夜晚 / ⟳ 自动 / ◷ 现实时间」四个控制按钮当场被销毁，
+  下一行 `document.getElementById('btn-day').onclick` 拿到 null，抛出 `Cannot set properties of null (setting 'onclick')`。
+  现在四个按钮正常显示并可点击，控制台零报错。
+- 修复冒烟检查长期红灯：README 断言仍在检查迁移前的旧仓库结构（`-pixel-orbit` 仓库与 `quality.yml` 工作流），与实际文件不符，工作流改名后没有同步更新。
+
+### Validation
+- `node tests/smoke.mjs` 通过；新增断言守住 `</o>` 畸形结束标签不会再次出现，并确认四个控制按钮仍在页面中。
+- 星球版在 showcase 模式下实测：控制台零报错，`btn-day / btn-night / btn-auto / btn-now` 均存在，时钟正常显示。
+
 ## v1.2.3 — 2026-11-13
 
 ### Added
