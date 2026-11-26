@@ -515,7 +515,7 @@
     cta.setAttribute('aria-label', tr('globe.cta.title', '在 GitHub 上提交插旗，作者会把你的旗子插上去'));
     cta.title = tr('globe.cta.title', '在 GitHub 上提交插旗，作者会把你的旗子插上去');
     cta.appendChild(icon(ICON_FLAG));
-    if (EMBED_OPTIONS.get('flag') !== '0') tools.appendChild(cta);
+    if (showControls && EMBED_OPTIONS.get('flag') !== '0') tools.appendChild(cta);
     if (tools.childElementCount) dock.appendChild(tools);
     if (showControls || showSearch) view.appendChild(dock);
 
