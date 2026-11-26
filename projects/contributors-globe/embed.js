@@ -28,9 +28,11 @@
 
   const previousStyle = slot.getAttribute('style');
   const previousEmbedKind = slot.getAttribute('data-gongshui-embed');
+  const previousGlobeMarker = slot.getAttribute('data-contributors-globe-embed');
   const previousChildren = [...slot.childNodes];
 
   slot.setAttribute('data-gongshui-embed', 'contributors-globe');
+  slot.setAttribute('data-contributors-globe-embed', '');
   slot.style.display = slot.style.display || 'block';
   slot.style.width = script.getAttribute('data-width') || slot.style.width || '100%';
 
@@ -53,8 +55,21 @@
     if (value !== null) frameUrl.searchParams.set(key, value);
   });
 
+  const contributorsSrc = script.getAttribute('data-contributors-src');
+  if (contributorsSrc) {
+    try {
+      const url = new URL(contributorsSrc, document.baseURI);
+      if (url.protocol === 'https:' && !url.username && !url.password) frameUrl.searchParams.set('data', url.href);
+    } catch (_) { /* Invalid or non-HTTPS data sources are ignored. */ }
+  }
+
   const submitUrl = script.getAttribute('data-submit-url');
-  if (submitUrl && /^https:\/\//i.test(submitUrl)) frameUrl.searchParams.set('submit', submitUrl);
+  if (submitUrl) {
+    try {
+      const url = new URL(submitUrl);
+      if (url.protocol === 'https:' && !url.username && !url.password) frameUrl.searchParams.set('submit', url.href);
+    } catch (_) { /* Invalid or non-HTTPS submission URLs are ignored. */ }
+  }
 
   const frame = document.createElement('iframe');
   frame.src = frameUrl.href;
@@ -131,6 +146,9 @@
         else slot.setAttribute('style', previousStyle);
         if (previousEmbedKind === null) slot.removeAttribute('data-gongshui-embed');
         else slot.setAttribute('data-gongshui-embed', previousEmbedKind);
+        if (previousGlobeMarker === null) slot.removeAttribute('data-contributors-globe-embed');
+        else slot.setAttribute('data-contributors-globe-embed', previousGlobeMarker);
+        delete slot.contributorsGlobe;
         delete slot.gongshuiEmbed;
       }
     }
@@ -139,7 +157,8 @@
   const languageObserver = new MutationObserver(() => api.setLanguage(document.documentElement.lang));
   languageObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
 
-  slot.gongshuiEmbed = api;
+  slot.contributorsGlobe = api;
+  slot.gongshuiEmbed = api; // Backward-compatible alias for existing Gongshui site integration.
   window.dispatchEvent(new CustomEvent('gongshui:embed:ready', {
     detail: { kind: 'contributors-globe', element: slot, iframe: frame, api }
   }));

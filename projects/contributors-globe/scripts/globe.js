@@ -18,7 +18,14 @@
   const GLOBE_LIB = 'https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js';
   const IMG = './assets/earth/';
   const COUNTRY_GEOJSON = './data/ne_110m_admin_0_countries.geojson';
-  const DATA_URL = './data/contributors.json';
+  const DATA_URL = (() => {
+    const configured = new URLSearchParams(window.location.search).get('data');
+    if (!configured) return './data/contributors.json';
+    try {
+      const url = new URL(configured, window.location.href);
+      return url.protocol === 'https:' && !url.username && !url.password ? url.href : './data/contributors.json';
+    } catch (_) { return './data/contributors.json'; }
+  })();
   const FLAG_DIR = './assets/flags/';
   const GLOBE_R = 100; // globe.gl 里地球半径固定是 100
 
@@ -144,8 +151,8 @@
   };
 
   const LOCAL_TEXT = {
-    en: {'globe.close':'Close','globe.work':'Open work · {title}','globe.view.title':'Contributors Globe','globe.loading':'Unfolding the globe…','globe.search.placeholder':'Search contributors…','globe.night':'Switch to night','globe.cta.title':'Submit a flag on GitHub; it will be added to the globe','globe.day':'Switch to day','globe.retry':'Retry','globe.nowebgl':'This device does not support a 3D globe. Browse the contributor list instead.','globe.error':'The globe could not load: {msg}','globe.network':'Network error'},
-    ja: {'globe.close':'閉じる','globe.work':'作品を見る · {title}','globe.view.title':'投稿者の地球','globe.loading':'地球を読み込み中…','globe.search.placeholder':'投稿者を検索…','globe.night':'夜に切り替え','globe.cta.title':'GitHub から旗を投稿できます','globe.day':'昼に切り替え','globe.retry':'再試行','globe.nowebgl':'この端末は3D地球に対応していません。投稿者リストをご覧ください。','globe.error':'地球を読み込めませんでした：{msg}','globe.network':'ネットワークエラー'}
+    en: {'globe.close':'Close','globe.work':'Open work · {title}','globe.view.title':'Contributors Globe','globe.loading':'Unfolding the globe…','globe.search.placeholder':'Search contributors…','globe.night':'Switch to night','globe.cta.title':'Open the submission page','globe.day':'Switch to day','globe.retry':'Retry','globe.nowebgl':'This device does not support a 3D globe. Browse the contributor list instead.','globe.error':'The globe could not load: {msg}','globe.network':'Network error'},
+    ja: {'globe.close':'閉じる','globe.work':'作品を見る · {title}','globe.view.title':'投稿者の地球','globe.loading':'地球を読み込み中…','globe.search.placeholder':'投稿者を検索…','globe.night':'夜に切り替え','globe.cta.title':'投稿ページを開く','globe.day':'昼に切り替え','globe.retry':'再試行','globe.nowebgl':'この端末は3D地球に対応していません。投稿者リストをご覧ください。','globe.error':'地球を読み込めませんでした：{msg}','globe.network':'ネットワークエラー'}
   };
   const tr = (key, fallback, vars) => {
     const value = (LOCAL_TEXT[getLanguage()] || {})[key] || fallback;
@@ -249,8 +256,8 @@
     return chip;
   };
 
-  const WORK_LABELS = {'pixel-daylight-switch':'像素昼夜开关','pixel-orbit':'像素圆环','contributors-globe':'投稿者地球','bookmarks-corridor':'收藏长廊','navigation-system':'导航交互系统'};
-  const workTitle = id => WORK_LABELS[id] || id;
+  // Work IDs and labels belong to the host application; unknown IDs remain readable as-is.
+  const workTitle = id => id;
   const goToWork = id => {
     closeGlobe();
     const workId = String(id || '');
@@ -499,7 +506,12 @@
 
     cta = el('a', 'globe-btn globe-btn--cta globe-btn--icon');
     const submitUrl = EMBED_OPTIONS.get('submit') || '';
-    const isValidSubmitUrl = /^https:\/\//i.test(submitUrl);
+    const isValidSubmitUrl = (() => {
+      try {
+        const url = new URL(submitUrl);
+        return url.protocol === 'https:' && !url.username && !url.password;
+      } catch (_) { return false; }
+    })();
     if (isValidSubmitUrl) {
       cta.href = submitUrl; cta.target = '_blank'; cta.rel = 'noopener noreferrer';
       cta.setAttribute('aria-label', tr('globe.cta.title', '提交投稿'));
@@ -833,7 +845,7 @@
       dayBtn.title = dayBtn.getAttribute('aria-label');
     }
     if (cta) {
-      const tip = tr('globe.cta.title', '在 GitHub 上提交插旗，作者会把你的旗子插上去');
+      const tip = tr('globe.cta.title', '打开投稿页面');
       cta.setAttribute('aria-label', tip);
       cta.title = tip;
     }
