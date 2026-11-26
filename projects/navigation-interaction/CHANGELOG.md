@@ -1,12 +1,12 @@
 # Changelog
 
-## 1.1.0 — 2026-11-26
+## 1.2.0
+- Add one-line script-only embedding.
+- Allow embedding one sample or a chosen subset of the 24 interactions.
+- Add configurable grid columns/gap and ready promise.
+- Keep sample indices stable when filtering.
+- Document API and licensing.
 
-- Added isolated two-line embed loader and documented public API.
-- Added programmatic selection, reset, state, and validated iframe messaging.
-- Added typed selection events.
-- Removed the copied portfolio stylesheet.
-
-## 1.0.0 — 2026-11-26
-
-- First independent release of the 24-button specimen.
+## 1.1.0
+- Independent iframe loader and public selection API.
+- Remove Gongshui website runtime dependencies.
