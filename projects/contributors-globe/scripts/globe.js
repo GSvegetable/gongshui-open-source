@@ -518,8 +518,6 @@
     if (showControls && EMBED_OPTIONS.get('flag') !== '0') tools.appendChild(cta);
     if (tools.childElementCount) dock.appendChild(tools);
     if (showControls || showSearch) view.appendChild(dock);
-
-    view.appendChild(dock);
     host.appendChild(view);
     host.classList.add('globe-mounted');
 
