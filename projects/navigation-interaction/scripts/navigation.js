@@ -18,7 +18,11 @@
   const columns = Math.max(1, Math.min(buttons.length || 1, Number(params.get('columns')) || Math.min(6, buttons.length || 1)));
   grid.style.gridTemplateColumns = 'repeat(' + columns + ', minmax(0, 1fr))';
   if (params.has('gap')) grid.style.gap = Math.max(0, Math.min(48, Number(params.get('gap')) || 0)) + 'px';
-  grid.classList.toggle('is-single-sample', buttons.length === 1);
+  const showcase = grid.closest('.nav-showcase');
+  if (showcase) {
+    showcase.classList.toggle('is-filtered', !!allowed);
+    showcase.classList.toggle('is-single-sample', buttons.length === 1);
+  }
   const parentOrigin = (() => {
     try { return document.referrer ? new URL(document.referrer).origin : ''; }
     catch (_) { return ''; }
