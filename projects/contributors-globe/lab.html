@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d1b"><title>投稿者地球 · 实验室</title>
+<style>
+:root{color-scheme:dark;--bg:#090d1b;--panel:#11182b;--line:#29334d;--ink:#f2f0e8;--muted:#98a4bd;--gold:#e6ad45;--blue:#829bc9}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1d2a4b 0%,var(--bg) 64%);color:var(--ink);font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.shell{width:min(1240px,calc(100% - 32px));margin:auto;padding:24px 0 48px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:1px solid var(--line);padding-bottom:18px}
+.brand{font-size:12px;font-weight:900;letter-spacing:.16em}.back{color:var(--muted);font-size:11px;text-decoration:none}.back:hover{color:var(--gold)}
+.intro{padding:30px 0 20px}.kicker{color:var(--gold);font-size:10px;letter-spacing:.22em}h1{font-size:clamp(28px,5vw,48px);line-height:1.08;letter-spacing:-.05em;margin:10px 0}.lede{color:var(--muted);font-size:12px;max-width:700px;margin:0}
+.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:16px;align-items:start}
+.preview,.panel{border:1px solid var(--line);background:linear-gradient(145deg,rgba(21,31,54,.96),rgba(12,17,31,.96));border-radius:14px;overflow:hidden;box-shadow:0 18px 54px #0005}
+.preview-head{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.16em;color:var(--muted)}
+.live{color:#b5d7a4;letter-spacing:.06em}.stage{height:clamp(350px,48vw,610px);min-height:350px;background:#050812;position:relative}.stage>div{position:absolute;inset:0;width:100%;height:100%}
+.panel{padding:18px}.panel h2{font-size:12px;letter-spacing:.12em;margin:0 0 14px}.group{padding:13px 0;border-top:1px solid var(--line)}.group:first-of-type{border-top:0;padding-top:0}
+.group-title{display:block;color:var(--muted);font-size:10px;margin-bottom:10px;letter-spacing:.12em}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+button,select{font:inherit;color:var(--ink);cursor:pointer}button{border:1px solid #44516c;background:#19233b;border-radius:7px;padding:8px 11px;font-size:11px;transition:background .18s,border-color .18s,transform .18s}
+button:hover{border-color:var(--gold);background:#27334d}button[aria-pressed=true],button.active{background:var(--gold);border-color:var(--gold);color:#171b27}
+select{width:100%;background:#10182a;border:1px solid #44516c;border-radius:7px;padding:9px;font-size:11px}
+.switch-row{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:11px;color:var(--ink);padding:7px 0}
+.switch-row input{accent-color:var(--gold);width:17px;height:17px}
+.info{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:10px;background:#0c1425;font-size:11px;color:var(--muted);line-height:1.8}
+.status{color:#d6b36d;min-height:20px;margin-top:12px;font-size:10px}.foot{margin-top:24px;color:#66718b;font-size:9px;letter-spacing:.12em}
+@media(max-width:800px){.shell{width:calc(100% - 22px);padding-top:14px}.layout{grid-template-columns:1fr}.stage{height:clamp(340px,90vw,520px)}.intro{padding-top:24px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+</style></head>
+<body><main class="shell">
+<header class="top"><span class="brand">GONGSHUI / CONTRIBUTORS GLOBE</span><a class="back" href="https://xn--3bts89a.com/">← 返回宫水.com</a></header>
+<section class="intro"><div class="kicker">INTERACTIVE LAB / 03</div><h1>投稿者地球实验室</h1><p class="lede">在真实地球组件上实验昼夜、语言、标记与 HUD 显示。所有示例人物都是虚构演示资料；这里不会开启投稿入口，也不会向任何服务提交内容。</p></section>
+<div class="layout">
+<section class="preview"><div class="preview-head"><span>LIVE GLOBE / REALTIME</span><span class="live">● PREVIEW</span></div><div class="stage"><div id="globe-mount"></div></div></section>
+<aside class="panel"><h2>实验控制台</h2>
+<div class="group"><span class="group-title">WORLD / 昼夜</span><div class="actions"><button id="day" aria-pressed="true">白天</button><button id="night" aria-pressed="false">夜晚</button></div></div>
+<div class="group"><span class="group-title">DATA / 数据模式</span><div class="actions"><button data-data="demo" class="active" aria-pressed="true">演示资料</button><button data-data="empty" aria-pressed="false">空白地球</button></div></div>
+<div class="group"><span class="group-title">DISPLAY / 界面元素</span>
+<label class="switch-row">显示投稿者标记<input id="pins" type="checkbox" checked></label>
+<label class="switch-row">显示搜索栏<input id="search" type="checkbox" checked></label>
+<label class="switch-row">显示 HUD 控件<input id="controls" type="checkbox" checked></label>
+</div>
+<div class="group"><span class="group-title">LANGUAGE / 语言</span><select id="language"><option value="zh-CN">简体中文</option><option value="en">English</option><option value="ja">日本語</option></select></div>
+<div class="info"><strong style="color:#e6ad45">关于演示资料</strong><br>演示模式加载仓库内的虚构数据文件，只用于观察标记布局。切换到空白地球会恢复作品默认空数据。旗帜投稿入口始终关闭，实验不会改动正式投稿者名单。</div>
+<div class="status" id="status" role="status" aria-live="polite">正在载入地球…</div></aside>
+</div><footer class="foot">CONTRIBUTORS GLOBE · EXPERIMENT WITH CARE</footer></main>
+<script>
+(()=>{'use strict';
+const BASE='https://gsvegetable.github.io/gongshui-open-source/projects/contributors-globe/';
+const $=id=>document.getElementById(id);const status=$('status');let api=null,night=false,dataMode='demo',mounting=false;
+function say(t){status.textContent=t}
+function mount(){if(mounting)return;mounting=true;if(api){api.destroy();api=null}
+ const slot=$('globe-mount');slot.replaceChildren();
+ const script=document.createElement('script');script.src=BASE+'embed.js?v=1.3.2';script.dataset.target='globe-mount';script.dataset.height='100%';script.dataset.loading='eager';script.dataset.controls=$('controls').checked?'1':'0';script.dataset.search=$('search').checked?'1':'0';script.dataset.pins=$('pins').checked?'1':'0';script.dataset.flag='0';script.dataset.lang=$('language').value;
+ if(dataMode==='demo')script.dataset.contributorsSrc=BASE+'data/lab-contributors.json';
+ window.addEventListener('gongshui:embed:ready',function ready(e){if(e.detail?.kind!=='contributors-globe')return;window.removeEventListener('gongshui:embed:ready',ready);api=e.detail.api;api.ready.then(ok=>{mounting=false;if(!ok){say('地球载入失败，请检查网络后重试。');return}api.setNight(night);say(dataMode==='demo'?'已载入虚构演示资料。':'空白地球已就绪。');});});
+ document.body.appendChild(script);
+}
+$('day').addEventListener('click',()=>{night=false;api?.setNight(false);$('day').setAttribute('aria-pressed','true');$('night').setAttribute('aria-pressed','false');say('已切换至白天。')});
+$('night').addEventListener('click',()=>{night=true;api?.setNight(true);$('day').setAttribute('aria-pressed','false');$('night').setAttribute('aria-pressed','true');say('已切换至夜晚。')});
+document.querySelectorAll('[data-data]').forEach(b=>b.addEventListener('click',()=>{dataMode=b.dataset.data;document.querySelectorAll('[data-data]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});mount()}));
+['pins','search','controls'].forEach(id=>$(id).addEventListener('change',mount));
+$('language').addEventListener('change',()=>{if(api){api.setLanguage($('language').value);say('语言设置已更新。')}else mount()});
+mount();
+})();
+</script></body></html>
