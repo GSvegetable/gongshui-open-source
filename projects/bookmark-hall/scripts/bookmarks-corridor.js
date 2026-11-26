@@ -46,6 +46,8 @@
   // 镜头运动
   const VMAX = 88, A_ACC = 170, A_DEC = 140;
 
+  const EMBED_OPTIONS = new URLSearchParams(window.location.search);
+  const MAX_ITEMS = Math.max(1, Math.min(1000, Number(EMBED_OPTIONS.get('max-items')) || 300));
   const REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   /* ---------------------------------------------------------
@@ -498,6 +500,11 @@
     vclose: q(viewer, 'vclose'), vstage: q(viewer, 'vstage'), vtitle: q(viewer, 'vtitle'), ven: q(viewer, 'ven'),
     vdesc: q(viewer, 'vdesc'), vlink: q(viewer, 'vlink'), vlinktext: q(viewer, 'vlinktext')
   };
+  if (EMBED_OPTIONS.get('controls') === '0') hud.hidden = true;
+  if (EMBED_OPTIONS.get('icons') === '0') {
+    hud.querySelectorAll('button svg').forEach(svg => { svg.hidden = true; });
+    viewer.querySelectorAll('button svg').forEach(svg => { svg.hidden = true; });
+  }
   view.append(canvas, vignette, hud, fade, viewer);
 
   let world = null;
@@ -1285,16 +1292,18 @@
       return;
     }
     if (msg.type !== 'gongshui:bookmark-hall:data' || !Array.isArray(msg.items)) return;
-    hostItems = msg.items.slice(0, 300);
+    hostItems = msg.items.slice(0, MAX_ITEMS);
     if (running && refreshData(true)) updateHud(true);
   });
   const setItems = items => {
     if (!Array.isArray(items)) return;
-    hostItems = items.slice(0, 300);
+    hostItems = items.slice(0, MAX_ITEMS);
     if (running && refreshData(true)) updateHud(true);
   };
   window.BookmarkHall = {
-    setItems, get count() { return hostItems.length; },
+    setItems(items) { if (!Array.isArray(items)) return false; hostItems = items.slice(0, MAX_ITEMS); if (running && refreshData(true)) updateHud(true); return true; },
+    get count() { return hostItems.length; },
+    get maxItems() { return MAX_ITEMS; },
     controls: { advance, back: () => advance(-1), openCurrent,
       get state() { return { running, stop: nav.stop, target: nav.target, stops: world ? world.stopS.length : 0, s: cam.s, moving: moving() }; } }
   };
