@@ -49,23 +49,30 @@
   });
   const applyConfig = next => {
     if (!next || typeof next !== 'object') return;
+    const previousBehavior = config.clickBehavior;
+    const previousGroup = config.groupBehavior;
     if (next.iconColor === 'black' || next.iconColor === 'white') {
       config.iconColor = next.iconColor;
       if (showcase) showcase.classList.toggle('is-icon-white', config.iconColor === 'white');
     }
-    if (typeof next.animations === 'boolean') config.animations = next.animations;
+    if (typeof next.animations === 'boolean') {
+      config.animations = next.animations;
+      if (!config.animations) allButtons.forEach(button => button.classList.remove('is-animating'));
+    }
     if (['none','hold','rebound'].includes(next.clickBehavior)) config.clickBehavior = next.clickBehavior;
     if (Number.isFinite(Number(next.reboundDelay))) config.reboundDelay = Math.max(0, Math.min(5000, Number(next.reboundDelay)));
-    if (['independent','exclusive','one-required'].includes(next.groupBehavior)) config.groupBehavior = next.groupBehavior;
-    if (config.groupBehavior === 'one-required') {
-      const active = allButtons.findIndex(button => button.classList.contains('active'));
-      if (active < 0 && allButtons.length) {
-        selectedIndex = 0;
-        setPressed(allButtons[0], true);
-      } else if (active >= 0) {
-        selectedIndex = active;
-        clearOthers(active);
-      }
+    if (['independent','exclusive'].includes(next.groupBehavior)) config.groupBehavior = next.groupBehavior;
+
+    // A stateless interaction cannot retain pressed buttons. Clear stale state
+    // when switching to it so aria-pressed and the visible surface stay aligned.
+    if (config.clickBehavior === 'none' && previousBehavior !== 'none') resetSelection();
+
+    // Switching from independent to exclusive collapses any existing multi-
+    // selection to the most recently selected visible button.
+    if (config.groupBehavior === 'exclusive' && previousGroup !== 'exclusive') {
+      const active = allButtons.findIndex((button, index) => buttons.includes(button) && button.classList.contains('active') && index === selectedIndex);
+      const keep = active >= 0 ? active : allButtons.findIndex(button => buttons.includes(button) && button.classList.contains('active'));
+      if (keep >= 0) clearOthers(keep);
     }
   };
   const resetSelection = () => {
@@ -83,22 +90,20 @@
       if (notifyParent) sendSelection(nextIndex);
       return true;
     }
-    if (config.groupBehavior === 'one-required') {
-      clearOthers(nextIndex);
-      selectedIndex = nextIndex;
-      setPressed(button, true);
-    } else if (config.clickBehavior === 'hold') {
+    if (config.groupBehavior === 'exclusive') clearOthers(nextIndex);
+    if (config.clickBehavior === 'hold') {
       const wasPressed = button.classList.contains('active');
-      if (config.groupBehavior === 'exclusive') clearOthers(nextIndex);
       setPressed(button, !wasPressed);
-      selectedIndex = nextIndex;
+      selectedIndex = wasPressed ? -1 : nextIndex;
     } else {
-      if (config.groupBehavior === 'exclusive') clearOthers(nextIndex);
       setPressed(button, true);
       clearTimer(nextIndex);
       const timer = setTimeout(() => {
         setPressed(button, false);
         timers.delete(nextIndex);
+        if (selectedIndex === nextIndex) {
+          selectedIndex = allButtons.findIndex(item => item.classList.contains('active'));
+        }
       }, config.reboundDelay);
       timers.set(nextIndex, timer);
       selectedIndex = nextIndex;
