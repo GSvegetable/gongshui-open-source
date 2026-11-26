@@ -105,6 +105,9 @@
       const lang = String(language || '').trim();
       if (lang) send({ type: 'gongshui:embed:language', lang });
     },
+    reset() {
+      send({ type: 'gongshui:navigation-interaction:reset' });
+    },
     onSelect(listener) {
       if (typeof listener !== 'function') return () => {};
       listeners.add(listener);
