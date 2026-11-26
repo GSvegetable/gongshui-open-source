@@ -29,3 +29,14 @@
 ## Licensing
 
 没有全仓库统一许可证。项目 1–2 保留各自现有条款；项目 3–5 的原创源代码分别采用 MIT，第三方依赖、媒体、数据和投稿者内容遵循各自条款。
+
+## English
+
+This repository contains standalone interactive works and reusable UI components. Projects 3–5 support one-line script installation, isolated rendering, public JavaScript APIs, configurable composition, and independent project-level MIT licenses for original source code.
+
+- [Embed guide and API reference](docs/EMBEDDING.md)
+- [Contributors Globe](projects/contributors-globe/README.md) — use the globe alone or selectively show pins, search, and controls.
+- [Bookmark Hall](projects/bookmark-hall/README.md) — provide your own array; one item or a collection works without our account system.
+- [Navigation Interaction](projects/navigation-interaction/README.md) — embed one button or any subset of the 24 samples.
+
+The repository has no blanket license. Projects 1–2 retain their existing terms. For projects 3–5, MIT applies to original source code/styles only; third-party assets, personal data, dependencies, and supplied content retain their own terms.
