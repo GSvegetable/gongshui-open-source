@@ -99,7 +99,14 @@
     iframe: frame,
     ready,
     setItems: function (items) {
-      if (Array.isArray(items)) send({ type: 'gongshui:bookmark-hall:data', items: items.slice(0, 300) });
+      if (!Array.isArray(items)) return false;
+      send({ type: 'gongshui:bookmark-hall:data', items: items.slice(0, 300) });
+      return true;
+    },
+    controls: {
+      advance: delta => send({ type: 'gongshui:bookmark-hall:control', action: 'advance', delta: Number(delta) || 1 }),
+      back: () => send({ type: 'gongshui:bookmark-hall:control', action: 'back' }),
+      openCurrent: () => send({ type: 'gongshui:bookmark-hall:control', action: 'openCurrent' })
     },
     setLanguage(language) {
       const lang = String(language || '').trim();
