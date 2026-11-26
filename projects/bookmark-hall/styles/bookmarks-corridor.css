@@ -173,3 +173,7 @@
   .bc-dock, .bc-viewer, .bc-v-card { transition-duration: 1ms; }
   .bc-hint { animation: none; }
 }
+
+/* Keep mobile taps clean: no browser blue flash around the artwork. */
+#bookmarks-view, #bookmarks-view * { -webkit-tap-highlight-color: transparent; }
+#bookmarks-view:focus, #bookmarks-view *:focus { outline: none; }
