@@ -37,14 +37,14 @@ const data=[
 {id:'lab-06',title:'像素黄昏',en:'Pixel Dusk',desc:'一段关于傍晚、色彩与缓慢时间的视觉练习。',folder:'VISUAL STUDIES'}
 ];
 function say(t){status.textContent=t}
-function mount(){const slot=$('hall-mount');slot.replaceChildren();const script=document.createElement('script');script.src=BASE+'embed.js?v=1.2.0';script.dataset.target='hall-mount';script.dataset.height='100%';script.dataset.loading='eager';script.dataset.controls='1';script.dataset.icons='1';
+function mount(){const slot=$('hall-mount');if(api){api.destroy();api=null}slot.replaceChildren();const script=document.createElement('script');script.src=BASE+'embed.js?v=1.2.0';script.dataset.target='hall-mount';script.dataset.height='100%';script.dataset.loading='eager';script.dataset.controls='1';script.dataset.icons='1';
  window.addEventListener('gongshui:embed:ready',function ready(e){if(e.detail?.kind!=='bookmark-hall')return;window.removeEventListener('gongshui:embed:ready',ready);api=e.detail.api;api.ready.then(ok=>{if(!ok){say('长廊载入失败。');return}applySet(activeSet);api.onOpen(msg=>{const item=data.find(x=>x.id===msg.id);selection.textContent=item?'已选中：'+item.title+' / '+item.en:'已打开收藏项目：'+msg.id;say('已触发作品查看事件。')});say('长廊已就绪，可以点击画面或使用控制台移动。')})});
  document.body.appendChild(script)}
 function applySet(key){activeSet=key;const items=key==='0'?[]:data.slice(0,Number(key));api?.setItems(items);selection.textContent=items.length?'已载入 '+items.length+' 件演示收藏。':'当前为空长廊。';say('收藏数据已更新。')}
 document.querySelectorAll('[data-set]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-set]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',String(x===b))});applySet(b.dataset.set)}));
 $('back').addEventListener('click',()=>{api?.controls.back();say('已发送后退指令。')});
 $('forward').addEventListener('click',()=>{api?.controls.advance(1);say('已发送前进指令。')});
-$('restart').addEventListener('click',()=>{if(activeSet==='0')return;api?.controls.advance(99);say('已请求沿长廊前进；到达尽头后可点击画面回到起点。')});
+$('restart').addEventListener('click',()=>{if(activeSet==='0')return;selection.textContent='正在重新进入长廊…';mount()});
 $('language').addEventListener('change',()=>{api?.setLanguage($('language').value);say('语言设置已更新。')});
 mount();
 })();
