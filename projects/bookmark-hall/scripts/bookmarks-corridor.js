@@ -71,7 +71,7 @@
   const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
 
   /* ---------------------------------------------------------
-     2. 文案（中 / 英 / 日；作品标题与简介直接读页面上已翻译的 DOM）
+     2. 文案（中 / 英 / 日；标题与简介由宿主通过公开数据协议传入）
      --------------------------------------------------------- */
   const lang = () => {
     const query = new URLSearchParams(window.location.search).get('lang');
@@ -81,19 +81,19 @@
   const TEXT = {
     zh: {
       gallery: '收藏长廊', run: '点击任意处，沿着线冲出去', next: '点击画框以外的任意处，继续前进', open: '查看作品', back: '后退',
-      emptyTitle: '长廊还是空的', emptySub: '在作品详情页点右上角的书签，收藏的作品会挂上这面墙。',
+      emptyTitle: '长廊还是空的', emptySub: '把收藏数据接入这座长廊，作品就会挂上墙。',
       allTitle: n => '共 ' + n + ' 件收藏', ghost: '空位', ghostSub: '这里留给你下一件收藏。',
       endTitle: '长廊的尽头', endSub: '点击回到起点', github: '查看 GitHub 项目', close: '关闭', aria: '收藏长廊：点击前进，点作品画框打开'
     },
     en: {
       gallery: 'THE HALL', run: 'Tap anywhere to run down the line', next: 'Tap anywhere else to keep running', open: 'Open work', back: 'Back',
-      emptyTitle: 'The hall is empty', emptySub: 'Bookmark a work from its detail page and it will hang on these walls.',
+      emptyTitle: 'The hall is empty', emptySub: 'Connect your saved works to fill these walls.',
       allTitle: n => n + (n === 1 ? ' work' : ' works') + ' collected', ghost: 'Empty niche', ghostSub: 'Saved for your next find.',
       endTitle: 'End of the hall', endSub: 'Tap to return to the start', github: 'View GitHub project', close: 'Close', aria: 'Bookmark hall: tap to run, tap a frame to open the work'
     },
     ja: {
       gallery: '回廊', run: 'どこでもタップして、線に沿って駆け抜ける', next: '額縁以外をタップで先へ進む', open: '作品を見る', back: '戻る',
-      emptyTitle: '回廊はまだ空です', emptySub: '作品の詳細でブックマークすると、ここの壁に飾られます。',
+      emptyTitle: '回廊はまだ空です', emptySub: '保存した作品を連携すると、壁に飾られます。',
       allTitle: n => n + '件のブックマーク', ghost: '空きスペース', ghostSub: '次のお気に入りのために空けてあります。',
       endTitle: '回廊の終点', endSub: 'タップで最初へ戻る', github: 'GitHub プロジェクトを見る', close: '閉じる', aria: 'ブックマーク回廊：タップで前進、額縁をタップで作品を開く'
     }
