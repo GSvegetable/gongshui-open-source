@@ -60,3 +60,15 @@ globe.destroy();
 ## 许可
 
 本目录的原创源代码按本目录 `LICENSE`（MIT）授权。投稿者个人资料、第三方贴图/旗帜/地理数据及第三方运行库不因该许可证自动获得再授权；再分发前请遵循各自来源的条款。
+
+## English quick start
+
+Add one script tag where the globe should appear. This creates its own container and shows only the Earth, with pins, search, and controls hidden:
+
+```html
+<script src="https://gsvegetable.github.io/gongshui-open-source/contributors-globe/embed.js" data-pins="0" data-controls="0" data-search="0"></script>
+```
+
+Set `data-flag="0"` to hide only the flag submission link; set `data-pins="0"` to hide contributor markers; set `data-search="0"` to hide search. The JavaScript API is available at the generated element's `.gongshuiEmbed` property. Await `api.ready`, subscribe with `api.onOpenWork(callback)`, and call `api.destroy()` when removing the component.
+
+The MIT license covers original source code/styles, not contributor personal data or third-party Earth imagery, flags, maps, and libraries. See [asset licensing](ASSET-LICENSING.md).
