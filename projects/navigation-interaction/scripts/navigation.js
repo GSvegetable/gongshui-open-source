@@ -8,7 +8,8 @@
   const params = new URLSearchParams(window.location.search);
   const rawSamples = params.get('samples');
   const requested = rawSamples ? rawSamples.split(',') : (params.has('sample') ? [params.get('sample')] : null);
-  const allowed = requested ? new Set(requested.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n < allButtons.length)) : null;
+  const validSamples = requested ? requested.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n < allButtons.length) : null;
+  const allowed = validSamples && validSamples.length ? new Set(validSamples) : null;
   const buttons = allButtons.filter(button => {
     const visible = !allowed || allowed.has(Number(button.dataset.navSample));
     button.hidden = !visible;
