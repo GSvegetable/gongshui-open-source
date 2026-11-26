@@ -47,7 +47,7 @@
   const VMAX = 88, A_ACC = 170, A_DEC = 140;
 
   const EMBED_OPTIONS = new URLSearchParams(window.location.search);
-  const MAX_ITEMS = Math.max(1, Math.min(1000, Number(EMBED_OPTIONS.get('max-items')) || 300));
+  const MAX_ITEMS = Math.max(1, Math.min(300, Number(EMBED_OPTIONS.get('max-items')) || 300));
   const REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   /* ---------------------------------------------------------
@@ -1289,6 +1289,12 @@
       document.documentElement.lang = language;
       hudKey = '';
       if (running && world) updateHud(true);
+      return;
+    }
+    if (msg.type === 'gongshui:bookmark-hall:control') {
+      if (msg.action === 'advance') advance(Number(msg.delta) || 1);
+      else if (msg.action === 'back') advance(-1);
+      else if (msg.action === 'openCurrent') openCurrent();
       return;
     }
     if (msg.type !== 'gongshui:bookmark-hall:data' || !Array.isArray(msg.items)) return;
