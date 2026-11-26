@@ -45,7 +45,10 @@ body{display:grid;place-items:center}
     if (!event.data || event.data.type !== 'pds-set-scene') return;
     setScene(event.data.scene);
   });
-  const announce = () => window.parent.postMessage({type:'pds-preview-ready'}, '*');
+  // Signal only after the component has mounted and the browser had two paint opportunities.
+  const announce = () => requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (root && window.PixelDaylightSwitch) window.parent.postMessage({type:'pds-preview-ready'}, '*');
+  }));
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', announce, {once:true});
   } else announce();
