@@ -507,7 +507,6 @@
   let iw = 0, ih = 0, P = 3, cssW = 1, cssH = 1;
   let img = null, buf = null, zbuf = null, rowZ = null, rowFog = null;
   let lastF = 1, lastCy = 0, lastPx0 = 0, shiftPx = 0;
-  const navEl = document.getElementById('mario-nav');
   let idleSkip = 0;
   let pBias = 0, renderEma = 0, slowCount = 0;
   let phase = 0;
@@ -519,17 +518,10 @@
   let hudKey = '';
 
   function measureSafe() {
-    let left = 0, bottom = 0;
-    if (navEl) {
-      const r = navEl.getBoundingClientRect(), vr = view.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) {
-        if (r.left - vr.left < 160 && r.height > r.width * 1.2) left = r.right - vr.left + 14;
-        else if (r.top - vr.top > vr.height * 0.6) bottom = vr.bottom - r.top + 12;
-      }
-    }
-    if (left) view.style.setProperty('--bc-left', Math.round(left) + 'px'); else view.style.removeProperty('--bc-left');
-    if (bottom) view.style.setProperty('--bc-bottom', Math.round(bottom) + 'px'); else view.style.removeProperty('--bc-bottom');
-    shiftPx = left ? Math.min(left * 0.5, cssW * 0.2) / P : 0;
+    // The artwork owns its viewport; safe-area spacing is handled by its stylesheet.
+    view.style.removeProperty('--bc-left');
+    view.style.removeProperty('--bc-bottom');
+    shiftPx = 0;
   }
 
   function resize() {
@@ -1123,9 +1115,8 @@
 
   function openViewer(item) {
     if (!item || viewerOpen) return;
-    if (window.parent !== window) {
-      const targetOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : '*'; } catch (_) { return '*'; } })();
-      window.parent.postMessage({ type: 'gongshui:bookmark-hall:open', id: item.id }, targetOrigin);
+    if (window.parent !== window && parentOrigin) {
+      window.parent.postMessage({ type: 'gongshui:bookmark-hall:open', id: item.id }, parentOrigin);
       return;
     }
     viewerOpen = true;
