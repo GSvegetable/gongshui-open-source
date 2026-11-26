@@ -32,13 +32,17 @@
 
   slot.setAttribute('data-gongshui-embed', 'navigation-interaction');
   slot.style.display = slot.style.display || 'block';
-  const singleSample = script.hasAttribute('data-sample') && !script.hasAttribute('data-samples');
-  slot.style.width = script.getAttribute('data-width') || slot.style.width || (singleSample ? '84px' : '100%');
+  const requestedSamples = (script.getAttribute('data-samples') || '').split(',').map(value => value.trim()).filter(Boolean);
+  const singleSample = script.hasAttribute('data-sample') || requestedSamples.length === 1;
+  const requestedButtonSize = Number(script.getAttribute('data-button-size'));
+  const buttonSize = Number.isFinite(requestedButtonSize) && requestedButtonSize > 0 ? Math.max(24, Math.min(128, requestedButtonSize)) : 48;
+  const singleMountSize = (buttonSize + 36) + 'px';
+  slot.style.width = script.getAttribute('data-width') || slot.style.width || (singleSample ? singleMountSize : '100%');
 
   if (script.hasAttribute('data-height')) {
     slot.style.height = script.getAttribute('data-height');
   } else if (singleSample && !slot.hasAttribute('data-embed-fill') && !slot.style.height) {
-    slot.style.height = '84px';
+    slot.style.height = singleMountSize;
     slot.style.aspectRatio = '1';
     slot.style.minHeight = '0';
   } else if (!slot.hasAttribute('data-embed-fill') && !slot.style.height) {
