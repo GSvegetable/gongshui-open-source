@@ -1,9 +1,7 @@
 (() => {
   'use strict';
-
   const grid = document.querySelector('.nav-showcase-grid');
   if (!grid) return;
-
   const allButtons = [...grid.querySelectorAll('.nav-showcase-button')];
   const params = new URLSearchParams(window.location.search);
   const rawSamples = params.get('samples');
@@ -25,79 +23,112 @@
     showcase.classList.toggle('is-filtered', !!allowed);
     showcase.classList.toggle('is-single-sample', buttons.length === 1);
   }
-  const parentOrigin = (() => {
-    try { return document.referrer ? new URL(document.referrer).origin : ''; }
-    catch (_) { return ''; }
-  })();
-
+  const parentOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
+  const config = { iconColor: 'black', animations: true, clickBehavior: 'rebound', reboundDelay: 360, groupBehavior: 'exclusive' };
+  const timers = new Map();
   let selectedIndex = -1;
-  function setIconColor(color) {
-    if (showcase) showcase.classList.toggle('is-icon-white', color === 'white');
-    return color === 'white' ? 'white' : 'black';
-  }
-  setIconColor('black');
-
-  function applySelection(index, notifyParent) {
-    const nextIndex = Number(index);
-    if (!Number.isInteger(nextIndex) || nextIndex < 0 || nextIndex >= allButtons.length || !buttons.includes(allButtons[nextIndex])) return false;
-
-    selectedIndex = nextIndex;
-    allButtons.forEach((button, indexInGrid) => {
-      const selected = indexInGrid === selectedIndex;
-      button.classList.toggle('active', selected);
-      button.classList.toggle('is-sample-active', selected);
-      button.setAttribute('aria-pressed', String(selected));
-    });
-
-    if (notifyParent) {
-      const detail = { index: selectedIndex, label: allButtons[selectedIndex].getAttribute('aria-label') || '' };
-      window.dispatchEvent(new CustomEvent('navigation-interaction:select', { detail }));
-      if (window.parent !== window && parentOrigin) {
-        window.parent.postMessage({ type: 'gongshui:navigation-interaction:select', ...detail }, parentOrigin);
+  const sendSelection = index => {
+    const detail = { index, label: allButtons[index].getAttribute('aria-label') || '' };
+    window.dispatchEvent(new CustomEvent('navigation-interaction:select', { detail }));
+    if (window.parent !== window && parentOrigin) window.parent.postMessage({ type: 'gongshui:navigation-interaction:select', ...detail }, parentOrigin);
+  };
+  const clearTimer = index => { if (timers.has(index)) { clearTimeout(timers.get(index)); timers.delete(index); } };
+  const setPressed = (button, pressed) => {
+    button.classList.toggle('active', pressed);
+    button.classList.toggle('is-sample-active', pressed);
+    button.setAttribute('aria-pressed', String(pressed));
+  };
+  const animate = button => {
+    if (!config.animations) return;
+    button.classList.remove('is-animating');
+    void button.offsetWidth;
+    button.classList.add('is-animating');
+  };
+  const clearOthers = except => allButtons.forEach((button, i) => {
+    if (i !== except) { clearTimer(i); setPressed(button, false); }
+  });
+  const applyConfig = next => {
+    if (!next || typeof next !== 'object') return;
+    if (next.iconColor === 'black' || next.iconColor === 'white') {
+      config.iconColor = next.iconColor;
+      if (showcase) showcase.classList.toggle('is-icon-white', config.iconColor === 'white');
+    }
+    if (typeof next.animations === 'boolean') config.animations = next.animations;
+    if (['none','hold','rebound'].includes(next.clickBehavior)) config.clickBehavior = next.clickBehavior;
+    if (Number.isFinite(Number(next.reboundDelay))) config.reboundDelay = Math.max(0, Math.min(5000, Number(next.reboundDelay)));
+    if (['independent','exclusive','one-required'].includes(next.groupBehavior)) config.groupBehavior = next.groupBehavior;
+    if (config.groupBehavior === 'one-required') {
+      const active = allButtons.findIndex(button => button.classList.contains('active'));
+      if (active < 0 && allButtons.length) {
+        selectedIndex = 0;
+        setPressed(allButtons[0], true);
+      } else if (active >= 0) {
+        selectedIndex = active;
+        clearOthers(active);
       }
     }
-    return true;
-  }
-
-  function resetSelection() {
+  };
+  const resetSelection = () => {
+    timers.forEach(timer => clearTimeout(timer));
+    timers.clear();
     selectedIndex = -1;
-    allButtons.forEach(button => {
-      button.classList.remove('active', 'is-sample-active');
-      button.setAttribute('aria-pressed', 'false');
-    });
-  }
-
+    allButtons.forEach(button => setPressed(button, false));
+  };
+  const applySelection = (index, notifyParent) => {
+    const nextIndex = Number(index);
+    if (!Number.isInteger(nextIndex) || nextIndex < 0 || nextIndex >= allButtons.length || !buttons.includes(allButtons[nextIndex])) return false;
+    const button = allButtons[nextIndex];
+    animate(button);
+    if (config.clickBehavior === 'none') {
+      if (notifyParent) sendSelection(nextIndex);
+      return true;
+    }
+    if (config.groupBehavior === 'one-required') {
+      clearOthers(nextIndex);
+      selectedIndex = nextIndex;
+      setPressed(button, true);
+    } else if (config.clickBehavior === 'hold') {
+      const wasPressed = button.classList.contains('active');
+      if (config.groupBehavior === 'exclusive') clearOthers(nextIndex);
+      setPressed(button, !wasPressed);
+      selectedIndex = nextIndex;
+    } else {
+      if (config.groupBehavior === 'exclusive') clearOthers(nextIndex);
+      setPressed(button, true);
+      clearTimer(nextIndex);
+      const timer = setTimeout(() => {
+        setPressed(button, false);
+        timers.delete(nextIndex);
+      }, config.reboundDelay);
+      timers.set(nextIndex, timer);
+      selectedIndex = nextIndex;
+    }
+    if (notifyParent) sendSelection(nextIndex);
+    return true;
+  };
+  allButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+  applyConfig(config);
   grid.addEventListener('click', event => {
     const button = event.target.closest('.nav-showcase-button');
     if (button && grid.contains(button)) applySelection(button.dataset.navSample, true);
   });
-  buttons.forEach(button => button.setAttribute('aria-pressed', 'false'));
-
   window.addEventListener('message', event => {
     if (window.parent === window || !parentOrigin || event.source !== window.parent || event.origin !== parentOrigin) return;
     const message = event.data;
     if (!message || typeof message !== 'object') return;
-    if (message.type === 'gongshui:navigation-interaction:icon-color') {
-      setIconColor(message.color);
-      return;
-    }
-    if (message.type === 'gongshui:navigation-interaction:reset') {
-      resetSelection();
-      return;
-    }
-    if (message.type === 'gongshui:embed:language' && typeof message.lang === 'string') {
-      document.documentElement.lang = message.lang.slice(0, 16);
-      return;
-    }
+    if (message.type === 'gongshui:navigation-interaction:config') { applyConfig(message.config); return; }
+    if (message.type === 'gongshui:navigation-interaction:reset') { resetSelection(); return; }
+    if (message.type === 'gongshui:embed:language' && typeof message.lang === 'string') { document.documentElement.lang = message.lang.slice(0,16); return; }
     if (message.type === 'gongshui:navigation-interaction:select') applySelection(message.index, false);
   });
-
   window.NavigationInteraction = {
     select: index => applySelection(index, true),
-    setIconColor,
+    setIconColor: color => applyConfig({ iconColor: color === 'white' ? 'white' : 'black' }),
+    configure: applyConfig,
     reset: resetSelection,
     get selectedIndex() { return selectedIndex; },
     get count() { return allButtons.length; },
-    get visibleCount() { return buttons.length; }
+    get visibleCount() { return buttons.length; },
+    get config() { return { ...config }; }
   };
 })();
