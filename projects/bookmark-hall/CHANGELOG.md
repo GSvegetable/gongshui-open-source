@@ -1,12 +1,12 @@
 # Changelog
 
-## 1.1.0 — 2026-11-26
+## 1.2.0
+- Add one-line script-only embedding.
+- Expose configurable item limits (default 300, maximum 1000).
+- Explicitly support single-item and arbitrary multi-item collections.
+- Add icon/HUD visibility options and ready promise.
+- Document data schema, API, and licensing.
 
-- Added isolated two-line embed loader and public data/event API.
-- Removed website navigation selectors and the `is-bookmarks` body-class dependency.
-- Made visibility and animation lifecycle independent of the website shell.
-- Required exact parent-origin validation for incoming bookmark data.
-
-## 1.0.0 — 2026-11-26
-
-- First independent release.
+## 1.1.0
+- Independent iframe loader and public data API.
+- Remove Gongshui website runtime dependencies.
