@@ -43,7 +43,7 @@ API：`selectWork(id)`、`onOpenWork(callback)`、`setLanguage(lang)`、`ready`�
 
 ## Bookmark Hall
 
-长廊不限制为两件收藏。通过 `setItems(array)` 传入 1–300 条记录（默认）；`data-max-items="500"` 可将上限调高，最大 300。一个对象也必须放进数组。数据由集成方管理，组件不写入账号或浏览器存储。
+长廊不限制为两件收藏。通过 `setItems(array)` 传入 1–300 条记录（默认）；`data-max-items` 可将上限调低，最大 300。一个对象也必须放进数组。数据由集成方管理，组件不写入账号或浏览器存储。
 
 ```js
 const hall = document.querySelector('[data-gongshui-embed="bookmark-hall"]').gongshuiEmbed;
