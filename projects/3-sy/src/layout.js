@@ -17,10 +17,20 @@ export const DP = {
 export const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 export const mod = (v, m) => ((v % m) + m) % m;
 
+/**
+ * 嵌入模式（?embed=1）：宿主把它嵌进一个很小的小窗口里（比如首页控制台的屏幕），
+ * 这时不能再按「手机 = 1px」的原尺寸画，否则一张卡就把小窗撑满、只看到局部。
+ * 改成按小窗比例整体缩小，让整条轨道都能进画面。
+ */
+const EMBED = typeof location !== 'undefined'
+  && new URLSearchParams(location.search).get('embed') === '1';
+
 /** 依据视口计算整套轨道度量。 */
 export function createLayout(vw, vh) {
   // 手机上 1dp ≈ 1css px；宽屏按平板的比例整体放大（参考视频约 1000dp × 675dp 的画面）。
-  const u = vw < 620 ? 1 : clamp(Math.min(vw / 1000, vh / 675), 1, 1.7);
+  const u = EMBED
+    ? clamp(Math.min(vw / 1000, vh / 675), 0.34, 1.7)
+    : vw < 620 ? 1 : clamp(Math.min(vw / 1000, vh / 675), 1, 1.7);
 
   const cardW = DP.CARD_W * u;
   const cardH = DP.CARD_H * u;
