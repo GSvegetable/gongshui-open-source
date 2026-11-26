@@ -204,6 +204,7 @@
   let resumeTimer = 0;
   let baseHeight = 0;           // 地球视图钉死的高度：键盘弹出时不跟着缩
   let readyPromise = null;
+  let embedReady = false;
   let pixelTex = null;          // 像素地球的贴图（白天 / 夜晚 / 星空）；null = 用写实照片
 
   /* ---------- 小零件：头像 / 国旗（加载失败有后备） ---------- */
@@ -809,6 +810,8 @@
     startTick();
     startGyro();
     refreshText();
+    embedReady = true;
+    announceEmbedReady();
   }
 
   function closeGlobe() {
@@ -959,6 +962,12 @@
   const showSearch = EMBED_OPTIONS.get('search') !== '0';
 
   const hostOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
+  const announceEmbedReady = () => {
+    if (window.parent === window || !hostOrigin || !embedReady) return;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      window.parent.postMessage({ type: 'gongshui:contributors-globe:ready' }, hostOrigin);
+    }));
+  };
   window.ContributorsGlobe = {
     open: openGlobe, close: closeGlobe, refresh: refreshText, isOpen: () => isOpen,
     selectWork: workId => { pendingSelectWork = String(workId || ''); if (contributors.length) applyPendingSelect(); }
@@ -967,6 +976,7 @@
     if (window.parent === window || !hostOrigin || event.source !== window.parent || event.origin !== hostOrigin) return;
     const message = event.data;
     if (!message || typeof message !== 'object') return;
+    if (message.type === 'gongshui:embed:ping') { announceEmbedReady(); return; }
     if (message.type === 'gongshui:embed:language' && typeof message.lang === 'string') {
       const language = message.lang.slice(0, 16);
       const url = new URL(window.location.href);
