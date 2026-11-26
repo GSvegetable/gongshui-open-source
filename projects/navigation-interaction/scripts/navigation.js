@@ -63,9 +63,9 @@
     if (Number.isFinite(Number(next.reboundDelay))) config.reboundDelay = Math.max(0, Math.min(5000, Number(next.reboundDelay)));
     if (['independent','exclusive'].includes(next.groupBehavior)) config.groupBehavior = next.groupBehavior;
 
-    // A stateless interaction cannot retain pressed buttons. Clear stale state
-    // when switching to it so aria-pressed and the visible surface stay aligned.
-    if (config.clickBehavior === 'none' && previousBehavior !== 'none') resetSelection();
+    // Changing interaction modes resets transient state so no button can keep
+    // a pressed appearance that belongs to the previous mode.
+    if (config.clickBehavior !== previousBehavior) resetSelection();
 
     // Switching from independent to exclusive collapses any existing multi-
     // selection to the most recently selected visible button.
@@ -94,7 +94,9 @@
     if (config.clickBehavior === 'hold') {
       const wasPressed = button.classList.contains('active');
       setPressed(button, !wasPressed);
-      selectedIndex = wasPressed ? -1 : nextIndex;
+      selectedIndex = wasPressed
+        ? allButtons.findIndex(item => item.classList.contains('active'))
+        : nextIndex;
     } else {
       setPressed(button, true);
       clearTimer(nextIndex);
