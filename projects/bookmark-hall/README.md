@@ -1,43 +1,24 @@
 # The Bookmark Hall / 收藏长廊
 
-Version: **1.0.0** (first independent release)
+Version: **1.1.0**
 
-A procedural pixel-art palace corridor rendered with Canvas 2D. The artwork is independent of the website platform and receives bookmark records from its embedding host.
+A procedural pixel-art palace corridor rendered with Canvas 2D. The visual experience is standalone; bookmark records arrive through a public data contract. The project never reads host website state or storage.
 
-## Run
+## Run independently
 
-Serve this directory over HTTP and open `index.html`. With no host data, the corridor starts in its empty state.
+Serve this directory over HTTP and open `index.html`. With no data, the corridor shows its designed empty state.
 
-## Host bridge
+## Embed in any website
 
-Send a message to the iframe:
+    <div data-bookmark-hall-embed></div>
+    <script src="https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/embed.js"></script>
 
-```js
-iframe.contentWindow.postMessage({
-  type: 'gongshui:bookmark-hall:data',
-  items: [{
-    id: 'pixel-orbit',
-    title: 'Pixel Orbit',
-    en: 'Pixel Orbit',
-    desc: 'A pixel-art world.',
-    github: 'https://github.com/GSvegetable/gongshui-open-source',
-    src: 'https://gsvegetable.github.io/gongshui-open-source/showcase.html',
-    ratio: 1.6439,
-    folder: 'Worlds'
-  }]
-}, 'https://gsvegetable.github.io');
-```
+    const hall = document.querySelector('[data-gongshui-embed="bookmark-hall"]').gongshuiEmbed;
+    hall.setItems([{ id: 'pixel-orbit', title: 'Pixel Orbit', folder: 'Worlds' }]);
+    hall.onOpen(({ id }) => console.log('Open work:', id));
 
-The renderer accepts this message only from its parent window and, when present, checks the sender origin against the embedding document's referrer origin. It emits `{ type: 'gongshui:bookmark-hall:open', id }` when the user opens a framed work. The parent must still validate the message origin before acting.
+Optional attributes: `data-target`, `data-width`, `data-height`, `data-ratio`, `data-min-height`, `data-label`, `data-lang`, and `data-loading`.
 
-Each item supports `id`, `title`, `en`, `desc`, `github`, `src`, `ratio`, and `folder`. The host is responsible for authentication, bookmark persistence, folder ordering, cross-device sync, and site navigation. The renderer does not read `AppState`, localStorage, or portfolio DOM.
+Each item supports `id` (required), `title`, `en`, `desc`, `github`, `src`, `ratio`, and `folder`. URLs are sanitized and input is capped at 300 records. The host owns authentication, persistence, folder ordering, synchronization, and navigation.
 
-## Structure
-
-- `index.html` — standalone entry.
-- `scripts/bookmarks-corridor.js` — corridor renderer and host bridge.
-- `styles/bookmarks-corridor.css` — visual styles.
-
-## Rights
-
-The original Gongshui artwork and project source remain copyrighted by their author unless a file states otherwise. No blanket redistribution license is granted by this repository.
+Host → work: `gongshui:bookmark-hall:data`; work → host: `gongshui:bookmark-hall:open`. Incoming messages require the actual parent window and exact referrer origin; the loader validates iframe source and origin.

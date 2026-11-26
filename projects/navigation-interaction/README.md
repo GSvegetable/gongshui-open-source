@@ -1,23 +1,20 @@
 # Navigation Interaction System / 导航交互系统
 
-Version: **1.0.0** (first independent release)
+Version: **1.1.0**
 
-An interactive specimen board for the pixel-style button language used by Gongshui. It demonstrates 24 tactile button states and remains deliberately separate from the real website navigation.
+An embeddable specimen of 24 tactile pixel-style button interactions. This standalone work owns its sample markup, visual states, selection behavior, and public API; it is not the website's actual navigation.
 
-## Run
+## Run independently
 
-Serve this directory over HTTP and open `index.html`.
+Serve this directory over HTTP and open `index.html`. Every sample is a real accessible button.
 
-## Structure
+## Embed in any website
 
-- `index.html` — standalone 24-button specimen board.
-- `styles/navigation.css` — isolated visual system.
-- `scripts/navigation.js` — selection and pressed-state interaction.
+    <div data-navigation-interaction-embed></div>
+    <script src="https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/embed.js"></script>
 
-## Boundary
+    const specimen = document.querySelector('[data-gongshui-embed="navigation-interaction"]').gongshuiEmbed;
+    specimen.select(7);
+    specimen.onSelect(({ index, label }) => console.log(index, label));
 
-The website continues to own actual navigation, routes, history, and accessibility behavior. This project owns only the independent interaction specimen. It must never be used as a replacement for the host application's routing or navigation logic.
-
-## Rights
-
-The original Gongshui artwork and project source remain copyrighted by their author unless a file states otherwise. No blanket redistribution license is granted by this repository.
+Host → work: `gongshui:navigation-interaction:select` with zero-based `index` (0–23); work → host emits the same event with `index` and `label`. The loader validates iframe source and origin.

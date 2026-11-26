@@ -40,3 +40,8 @@ The Pages deployment workflow assembles all five projects while preserving the e
 - Website GitHub Pages deployment completed successfully.
 
 A final visual check on real mobile/tablet browsers remains useful for appearance and touch feel, but the repository ownership and deployment cutover are complete.
+
+
+## Componentization follow-up — 2026-11-26
+
+Projects 3–5 now have two-line `embed.js` loaders, documented container APIs, validated events, and standalone operation. Website-specific globals and selectors were removed from Contributors Globe and Bookmark Hall. Navigation Interaction no longer contains the copied portfolio stylesheet. See [Embed API guide](EMBEDDING.md).
