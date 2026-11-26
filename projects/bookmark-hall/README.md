@@ -88,3 +88,15 @@ hall.destroy();
 ## 许可
 
 本目录的原创源代码按本目录 `LICENSE`（MIT）授权。MIT 不代表替第三方网站内容、用户提交作品或第三方素材授予权利；请确保你有权展示自己传入的收藏内容。
+
+## English quick start
+
+Install with one script tag; the loader creates the container automatically:
+
+```html
+<script src="https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/embed.js" data-icons="0"></script>
+```
+
+After the script has run, get the generated element's `.gongshuiEmbed` API, await `api.ready`, then call `api.setItems([...])`. Pass an array with one object for a single bookmark, or any number of objects up to the configured 300-item maximum. Each item requires a unique `id` and `title`. The host application owns persistence, authentication, and navigation; the component only renders the data you pass in.
+
+Use `data-icons="0"` to hide decorative button icons or `data-controls="0"` to hide the full HUD. See the data schema and API examples above. The MIT license covers original source code/styles only; you must have rights to display any content you pass to the component. See [content licensing](ASSET-LICENSING.md).
