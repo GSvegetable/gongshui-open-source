@@ -536,18 +536,17 @@
     window.addEventListener('orientationchange', () => { baseHeight = window.innerHeight; syncViewport(); });
   }
 
-  function toggleNight() {
-    night = !night;
-    dayBtn.replaceChildren(icon(night ? ICON_SUN : ICON_MOON));
-    dayBtn.setAttribute('aria-pressed', String(night));
-    dayBtn.setAttribute('aria-label', night ? tr('globe.day', '看白天') : tr('globe.night', '看夜晚'));
-    dayBtn.title = dayBtn.getAttribute('aria-label');
-    if (g) {
-      g.globeImageUrl(pixelTex
-        ? (night ? pixelTex.night : pixelTex.day)
-        : IMG + (night ? 'earth-night.jpg' : 'earth-blue-marble.jpg'));
+  function setNight(enabled) {
+    night = !!enabled;
+    if (dayBtn) {
+      dayBtn.replaceChildren(icon(night ? ICON_SUN : ICON_MOON));
+      dayBtn.setAttribute('aria-pressed', String(night));
+      dayBtn.setAttribute('aria-label', night ? tr('globe.day', '看白天') : tr('globe.night', '看夜晚'));
+      dayBtn.title = dayBtn.getAttribute('aria-label');
     }
+    if (g) g.globeImageUrl(pixelTex ? (night ? pixelTex.night : pixelTex.day) : IMG + (night ? 'earth-night.jpg' : 'earth-blue-marble.jpg'));
   }
+  function toggleNight() { setNight(!night); }
 
   function showStatus(message, isError, retry) {
     statusBox.hidden = false;
@@ -990,6 +989,9 @@
     }
     if (message.type === 'gongshui:contributors-globe:select-work' && typeof message.workId === 'string') {
       window.ContributorsGlobe.selectWork(message.workId);
+    }
+    if (message.type === 'gongshui:contributors-globe:set-night' && typeof message.enabled === 'boolean') {
+      setNight(message.enabled);
     }
   });
 })();
