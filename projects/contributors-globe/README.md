@@ -1,27 +1,26 @@
 # Contributors Globe / 投稿者地球
 
-Version: **1.0.0** (first independent release)
+Version: **1.1.0**
 
-A standalone interactive globe showing contributors by country. The project owns its renderer, data, geographic boundaries, flag assets, and Earth textures.
+A standalone, embeddable interactive globe. The project owns its renderer, contributor data, boundaries, flags, Earth textures, local language strings, and public API.
 
-## Run
+## Run independently
 
-Serve this directory over HTTP (for example, with `python -m http.server`) and open `index.html`. WebGL is used when available; the renderer retains a list fallback when it is not.
+Serve this directory over HTTP and open `index.html`. WebGL is used when available; a contributor-list fallback remains available without WebGL.
 
-## Structure
+## Embed in any website
 
-- `index.html` — standalone entry.
-- `scripts/globe.js` — rendering, contributor normalization, interaction, and fallback.
-- `styles/globe.css` — project styles.
-- `data/contributors.json` — contributor records.
-- `data/ne_110m_admin_0_countries.geojson` — country boundaries.
-- `assets/earth/` — original Earth textures.
-- `assets/flags/` — country flags.
+    <div data-contributors-globe-embed></div>
+    <script src="https://gsvegetable.github.io/gongshui-open-source/contributors-globe/embed.js"></script>
 
-## Runtime dependency
+    const globe = document.querySelector('[data-gongshui-embed="contributors-globe"]').gongshuiEmbed;
+    globe.selectWork('pixel-orbit');
+    globe.onOpenWork(({ workId }) => console.log(workId));
 
-Globe.GL **2.46.2** is loaded from the pinned jsDelivr URL in `scripts/globe.js`. Globe.GL is distributed under the MIT License. See [upstream package and license](https://www.npmjs.com/package/globe.gl). The renderer falls back to the contributor list if WebGL or the 3D runtime is unavailable.
+Optional attributes: `data-target`, `data-width`, `data-height`, `data-ratio`, `data-min-height`, `data-label`, `data-lang` (`zh`, `en`, `ja`), and `data-loading`.
 
-## Rights
+Host → work: `gongshui:contributors-globe:select-work`; work → host: `gongshui:contributors-globe:open-work`. The loader validates iframe source and origin.
 
-The original Gongshui artwork and project source remain copyrighted by their author unless a file states otherwise. Third-party assets and libraries retain their own licenses. No blanket redistribution license is granted by this repository.
+Edit `data/contributors.json`; required fields are `name` and a two-letter `country`. Optional: `github`, `avatar`, `city`, `lat`, `lng`, `pin`, `works`, and `note`. Coordinates are rounded for privacy. Globe.GL 2.46.2 is pinned from jsDelivr and MIT-licensed.
+
+The original Gongshui artwork and project source remain copyrighted by their author unless a file states otherwise.

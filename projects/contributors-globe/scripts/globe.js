@@ -50,15 +50,14 @@
   const flagUrl = code => FLAG_DIR + String(code || '').toUpperCase() + '.svg';
   const round2 = v => Math.round(v * 100) / 100; // 约 1 公里：保护投稿者隐私，不会暴露到门牌
 
-  /* 国家名：英文态用系统自带的国家名，中文态用内置表 */
+  const getLanguage = () => {
+    const query = new URLSearchParams(window.location.search).get('lang');
+    const raw = query || document.documentElement.lang || 'zh-CN';
+    return /^ja/i.test(raw) ? 'ja' : /^en/i.test(raw) ? 'en' : 'zh';
+  };
   const countryLabel = code => {
-    const i18n = window.siteI18n;
-    const lang = i18n && i18n.lang === 'ja' ? 'ja-JP' : i18n && i18n.lang === 'en' ? 'en' : 'zh-CN';
-    const info = COUNTRIES[code];
-    try {
-      const name = new Intl.DisplayNames([lang], { type: 'region' }).of(code);
-      if (name) return name;
-    } catch (_) { /* 老浏览器没有 Intl.DisplayNames */ }
+    const info = COUNTRIES[code], locale = getLanguage() === 'ja' ? 'ja-JP' : getLanguage() === 'en' ? 'en' : 'zh-CN';
+    try { const name = new Intl.DisplayNames([locale], { type: 'region' }).of(code); if (name) return name; } catch (_) {}
     return info ? info[2] : code;
   };
 
@@ -135,9 +134,7 @@
     return;
   }
 
-  /* ---------- 页面接入 ---------- */
-  const navHome = document.getElementById('nav-home');
-  // 指南针视图只存在于首页；别的页面直接不启动
+  /* ---------- Standalone mount ---------- */
   if (!document.getElementById('compass-view')) return;
 
   const el = (tag, className, text) => {
@@ -147,17 +144,14 @@
     return node;
   };
 
-  /* 取词：跟着站点的中英切换走（英文走 index.html 的 siteI18n，中文回退写在调用处） */
+  const LOCAL_TEXT = {
+    en: {'globe.close':'Close','globe.work':'Open work · {title}','globe.view.title':'Contributors Globe','globe.loading':'Unfolding the globe…','globe.search.placeholder':'Search contributors…','globe.night':'Switch to night','globe.cta.title':'Submit a flag on GitHub; it will be added to the globe','globe.day':'Switch to day','globe.retry':'Retry','globe.nowebgl':'This device does not support a 3D globe. Browse the contributor list instead.','globe.error':'The globe could not load: {msg}','globe.network':'Network error'},
+    ja: {'globe.close':'閉じる','globe.work':'作品を見る · {title}','globe.view.title':'投稿者の地球','globe.loading':'地球を読み込み中…','globe.search.placeholder':'投稿者を検索…','globe.night':'夜に切り替え','globe.cta.title':'GitHub から旗を投稿できます','globe.day':'昼に切り替え','globe.retry':'再試行','globe.nowebgl':'この端末は3D地球に対応していません。投稿者リストをご覧ください。','globe.error':'地球を読み込めませんでした：{msg}','globe.network':'ネットワークエラー'}
+  };
   const tr = (key, fallback, vars) => {
-    const i18n = window.siteI18n;
-    const isEn = i18n && i18n.lang !== 'zh';
-    let value = fallback;
-    if (isEn && i18n && typeof i18n.t === 'function') {
-      const en = i18n.t(key, vars);
-      if (en) value = en;
-    }
+    const value = (LOCAL_TEXT[getLanguage()] || {})[key] || fallback;
     if (!vars) return value;
-    return Object.keys(vars).reduce((s, name) => s.split('{' + name + '}').join(vars[name]), value);
+    return Object.keys(vars).reduce((s, name) => s.split('{' + name + '}').join(String(vars[name])), value);
   };
 
   const readDuration = () => {
@@ -268,18 +262,13 @@
     return chip;
   };
 
-  /* ---------- 信息卡 ---------- */
-  const workTitle = id => {
-    const t = document.querySelector('.preview-card[data-id="' + CSS.escape(id) + '"] .card-title');
-    return t ? t.textContent : '';
-  };
-
+  const WORK_LABELS = {'pixel-daylight-switch':'像素昼夜开关','pixel-orbit':'像素圆环','contributors-globe':'投稿者地球','bookmarks-corridor':'收藏长廊','navigation-system':'导航交互系统'};
+  const workTitle = id => WORK_LABELS[id] || id;
   const goToWork = id => {
-    const target = document.querySelector('.preview-card[data-id="' + CSS.escape(id) + '"]');
     closeGlobe();
-    if (!target) return;
-    if (navHome) navHome.click();
-    setTimeout(() => { if (!target.classList.contains('hidden')) target.click(); }, 80);
+    const workId = String(id || '');
+    window.dispatchEvent(new CustomEvent('contributors-globe:open-work', { detail: { workId } }));
+    if (window.parent !== window && hostOrigin) window.parent.postMessage({ type: 'gongshui:contributors-globe:open-work', workId }, hostOrigin);
   };
 
   const renderCard = c => {
@@ -801,15 +790,14 @@
     return readyPromise;
   }
 
-  /* ---------- 打开 / 关闭 ----------
-     指南针是首页里的一个视图，开关由主站的 main.js（setCompassView）负责，
-     它来调这里的 open() / close()。这里不再自己动导航按钮，免得两边打架。 */
+  /* ---------- Public lifecycle: this work owns its own open / close state. ---------- */
   async function openGlobe() {
     buildDom();
     if (!view) return;
     if (isOpen && readyPromise) return;
     isOpen = true;
     view.setAttribute('aria-hidden', 'false');
+    view.classList.add('is-open');
     // iOS 需要用户手势里申请陀螺仪权限（Android 不需要）
     if (window.DeviceOrientationEvent && typeof window.DeviceOrientationEvent.requestPermission === 'function') {
       try { await window.DeviceOrientationEvent.requestPermission(); } catch (_) {}
@@ -832,7 +820,7 @@
       view.style.setProperty('--kb-pan', '0px');
       view.style.setProperty('--kb-lift', '0px');
     }
-    if (view) view.setAttribute('aria-hidden', 'true');
+    if (view) { view.setAttribute('aria-hidden', 'true'); view.classList.remove('is-open'); }
     if (selected) deselect();
     clearTimeout(resumeTimer);
     if (g) setTimeout(() => { if (!isOpen) g.pauseAnimation(); }, readDuration() + 60);
@@ -966,24 +954,14 @@
     if (target) select(target, true);
   }
 
-  /* 暴露给主站：main.js 的 setCompassView(true / false) 会调这里 */
-  window.siteGlobe = {
-    open: openGlobe,
-    close: closeGlobe,
-    refresh: refreshText,
-    isOpen: () => isOpen,
-    selectWork: workId => {
-      pendingSelectWork = workId;
-      if (contributors.length) applyPendingSelect();
-    },
-  };
-
   const hostOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
+  window.ContributorsGlobe = {
+    open: openGlobe, close: closeGlobe, refresh: refreshText, isOpen: () => isOpen,
+    selectWork: workId => { pendingSelectWork = String(workId || ''); if (contributors.length) applyPendingSelect(); }
+  };
   window.addEventListener('message', event => {
-    if (event.source !== window.parent || (hostOrigin && event.origin !== hostOrigin)) return;
+    if (window.parent === window || !hostOrigin || event.source !== window.parent || event.origin !== hostOrigin) return;
     const message = event.data;
-    if (message && message.type === 'gongshui:contributors-globe:select-work' && typeof message.workId === 'string') {
-      window.siteGlobe.selectWork(message.workId);
-    }
+    if (message && message.type === 'gongshui:contributors-globe:select-work' && typeof message.workId === 'string') window.ContributorsGlobe.selectWork(message.workId);
   });
 })();

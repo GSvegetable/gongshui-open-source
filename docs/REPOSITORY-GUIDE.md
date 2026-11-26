@@ -11,11 +11,15 @@ This repository is the source of truth for the implementations of all independen
 |---|---|---|---|---|
 | 1 | Pixel Daylight Switch | `projects/pixel-daylight-switch/` | `/pixel-daylight-switch/preview.html` | npm package 3.1.1 |
 | 2 | Pixel Orbit | `projects/pixel-orbit/` | `/showcase.html` | 1.2.3 |
-| 3 | Contributors Globe | `projects/contributors-globe/` | `/contributors-globe/` | 1.0.0 |
-| 4 | The Bookmark Hall | `projects/bookmark-hall/` | `/bookmark-hall/` | 1.0.0 |
-| 5 | Navigation Interaction System | `projects/navigation-interaction/` | `/navigation-interaction/` | 1.0.0 |
+| 3 | Contributors Globe | `projects/contributors-globe/` | `/contributors-globe/` | 1.1.0 |
+| 4 | The Bookmark Hall | `projects/bookmark-hall/` | `/bookmark-hall/` | 1.1.0 |
+| 5 | Navigation Interaction System | `projects/navigation-interaction/` | `/navigation-interaction/` | 1.1.0 |
 
 Each project owns its implementation, assets, tests, version, changelog and dependency notices. There is no monorepo-wide product version or blanket license. The first two projects retain their existing licensing terms. The migrated projects retain the original author's copyright unless a specific third-party license applies; do not infer a broad reuse license.
+
+## Embed standard
+
+All five projects provide standalone pages and reusable `embed.js` loaders for isolated iframe embedding. Projects 3–5 expose a container-level `gongshuiEmbed` API and validated event subscriptions; see [Embed API guide](EMBEDDING.md).
 
 ## Host / artwork boundary
 
@@ -34,13 +38,13 @@ The standalone corridor accepts:
 
 ### Contributors Globe
 
-The standalone globe has its own mount element, contributor JSON, country-boundary data, flag assets, and Earth textures. It has a local language fallback based on the document's `lang`; the website may set that attribute when embedding. The renderer does not require website portfolio-card markup.
+The standalone globe owns contributor data, geographic assets, language strings, and the open/close lifecycle. It no longer reads website i18n, navigation controls, or portfolio-card markup. Its embed API exposes `selectWork()` and `onOpenWork()`.
 
 The current Globe.GL runtime is pinned to an exact jsDelivr version in the standalone script and is MIT-licensed. Its package license and version are documented upstream: https://www.npmjs.com/package/globe.gl
 
 ### Navigation Interaction System
 
-This project is an interactive specimen of the site's pixel button visual language. It is not the website's real navigation implementation. Actual routing, navigation accessibility, and application behavior remain in `gongshui-pages`.
+This project is an independent 24-button interaction specimen with a public `select()` / `onSelect()` API. Actual routing and application navigation remain in `gongshui-pages`. The copied `portfolio-works.css` has been removed.
 
 ## Deployment
 

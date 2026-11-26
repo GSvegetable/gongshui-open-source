@@ -28,14 +28,23 @@ jobs:
           node-version: 22
       - name: Check JavaScript syntax
         run: |
+          node --check projects/contributors-globe/embed.js
+          node --check projects/bookmark-hall/embed.js
+          node --check projects/navigation-interaction/embed.js
           node --check projects/contributors-globe/scripts/globe.js
           node --check projects/bookmark-hall/scripts/bookmarks-corridor.js
           node --check projects/navigation-interaction/scripts/navigation.js
       - name: Check project boundaries and required assets
         run: |
-          ! grep -Eq 'AppState|localStorage|preview-card|siteI18n' projects/bookmark-hall/scripts/bookmarks-corridor.js
+          ! grep -Eq 'AppState|localStorage|preview-card|siteI18n|siteCorridor|is-bookmarks|mario-nav' projects/bookmark-hall/scripts/bookmarks-corridor.js
+          ! grep -Eq 'siteI18n|siteGlobe|preview-card|nav-home' projects/contributors-globe/scripts/globe.js
+          ! grep -Eq 'mario-nav|portfolio-live|portfolio-embed|top-bar' projects/navigation-interaction/styles/navigation.css
+          ! test -e projects/navigation-interaction/styles/portfolio-works.css
           grep -q 'gongshui:bookmark-hall:data' projects/bookmark-hall/scripts/bookmarks-corridor.js
           grep -q 'globe.gl@2.46.2' projects/contributors-globe/scripts/globe.js
+          test -s projects/contributors-globe/embed.js
+          test -s projects/bookmark-hall/embed.js
+          test -s projects/navigation-interaction/embed.js
           test -s projects/contributors-globe/index.html
           test -s projects/contributors-globe/data/contributors.json
           test -s projects/contributors-globe/data/ne_110m_admin_0_countries.geojson
@@ -45,6 +54,9 @@ jobs:
           test -s projects/contributors-globe/assets/earth/night-sky.jpg
           test -s projects/bookmark-hall/index.html
           test -s projects/navigation-interaction/index.html
+          grep -q 'gongshui:embed:ready' projects/contributors-globe/embed.js
+          grep -q 'gongshui:embed:ready' projects/bookmark-hall/embed.js
+          grep -q 'gongshui:embed:ready' projects/navigation-interaction/embed.js
       - name: Check navigation specimen count
         run: |
           count=$(grep -o 'data-nav-sample=' projects/navigation-interaction/index.html | wc -l)

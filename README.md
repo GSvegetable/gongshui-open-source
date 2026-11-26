@@ -8,9 +8,9 @@ The source-of-truth monorepo for the independent interactive works shown on [Gon
 |---|---|---|---|---|
 | 1 | Pixel Daylight Switch | [Source](projects/pixel-daylight-switch/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/pixel-daylight-switch/preview.html) | 3.1.1 |
 | 2 | Pixel Orbit | [Source](projects/pixel-orbit/) | [Showcase](https://gsvegetable.github.io/gongshui-open-source/showcase.html) | 1.2.3 |
-| 3 | Contributors Globe / 投稿者地球 | [Source](projects/contributors-globe/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/contributors-globe/) | 1.0.0 |
-| 4 | The Bookmark Hall / 收藏长廊 | [Source](projects/bookmark-hall/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/) | 1.0.0 |
-| 5 | Navigation Interaction System / 导航交互系统 | [Source](projects/navigation-interaction/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/) | 1.0.0 |
+| 3 | Contributors Globe / 投稿者地球 | [Source](projects/contributors-globe/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/contributors-globe/) | 1.1.0 |
+| 4 | The Bookmark Hall / 收藏长廊 | [Source](projects/bookmark-hall/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/bookmark-hall/) | 1.1.0 |
+| 5 | Navigation Interaction System / 导航交互系统 | [Source](projects/navigation-interaction/) | [Preview](https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/) | 1.1.0 |
 
 ## Architecture
 
@@ -18,6 +18,10 @@ The source-of-truth monorepo for the independent interactive works shown on [Gon
 - `gongshui-open-source`: independent work implementations, assets, data, docs, tests, versions and deployment.
 
 The website can embed a work and pass public data to it, but must not own a duplicate renderer or expose its private application state. See [Repository guide](docs/REPOSITORY-GUIDE.md) and [migration status](docs/MIGRATION-STATUS.md).
+
+## Embedding
+
+Projects 3–5 now provide isolated two-line `embed.js` loaders and documented APIs. See [Embed API guide](docs/EMBEDDING.md).
 
 ## Terms
 
@@ -27,6 +31,6 @@ There is no blanket license for this monorepo. Pixel Daylight Switch uses Unlice
 
 这是宫水.com 五个独立作品的源码主仓库。网站仓库只负责平台本身，包括 UI、登录、账号、收藏数据、搜索、设置和作品目录；本仓库负责五个作品的实现、素材、数据、文档和版本。
 
-第三至第五个作品已经建立独立入口。收藏长廊通过经过来源校验的 `postMessage` 接收网站传来的收藏记录，网站仍然负责账号、收藏持久化和打开详情；地球作品拥有自己的数据与贴图资源；导航交互系统只展示按钮交互样本，不接管网站真实导航。
+五个作品均有独立入口。第三至第五个作品现已补齐隔离式 `embed.js` 加载器、公开 API 和来源校验的事件通信；收藏长廊只接收宿主传入的数据，地球不再读取网站全局或作品卡片 DOM，导航交互系统不接管网站真实路由。
 
 没有全仓库通用许可证。请分别查看各作品的使用条款和第三方依赖许可证。

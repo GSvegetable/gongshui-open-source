@@ -1,5 +1,5 @@
 /* =========================================================
-   收藏长廊（收藏页） — v1.3.0
+   收藏长廊（独立作品） — v1.3.0
    ---------------------------------------------------------
    一根金色的引导线，穿过一座巨大的宫殿长廊。
    两侧是高耸的墙，收藏的作品挂在每个拐角正对你的那面墙上。
@@ -1268,39 +1268,34 @@
     closeViewer();
   }
   function sync() {
-    const on = document.body.classList.contains('is-bookmarks') && !view.hidden;
-    if (on) start(); else stop();
+    if (!view.hidden && document.visibilityState !== 'hidden') start();
+    else stop();
   }
 
-  new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  document.addEventListener('visibilitychange', sync);
   new MutationObserver(sync).observe(view, { attributes: true, attributeFilter: ['hidden'] });
   if ('ResizeObserver' in window) new ResizeObserver(() => { if (running) { resize(); lastT = 0; } }).observe(view);
   window.addEventListener('resize', () => { if (running) resize(); });
-  // Parent bridge: accept only messages from the embedding parent. If referrer is
-  // available, require the exact origin; otherwise accept the parent window only.
+  // Accept host data only from the actual parent and its exact referrer origin.
   const parentOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
   window.addEventListener('message', event => {
-    if (event.source !== window.parent || (parentOrigin && event.origin !== parentOrigin)) return;
+    if (window.parent === window || !parentOrigin || event.source !== window.parent || event.origin !== parentOrigin) return;
     const msg = event.data;
     if (!msg || msg.type !== 'gongshui:bookmark-hall:data' || !Array.isArray(msg.items)) return;
     hostItems = msg.items.slice(0, 300);
     if (running && refreshData(true)) updateHud(true);
   });
-  window.bookmarkHall = {
-    setItems(items) {
-      if (!Array.isArray(items)) return;
-      hostItems = items.slice(0, 300);
-      if (running && refreshData(true)) updateHud(true);
-    },
-    get count() { return hostItems.length; }
+  const setItems = items => {
+    if (!Array.isArray(items)) return;
+    hostItems = items.slice(0, 300);
+    if (running && refreshData(true)) updateHud(true);
+  };
+  window.BookmarkHall = {
+    setItems, get count() { return hostItems.length; },
+    controls: { advance, back: () => advance(-1), openCurrent,
+      get state() { return { running, stop: nav.stop, target: nav.target, stops: world ? world.stopS.length : 0, s: cam.s, moving: moving() }; } }
   };
   window.addEventListener('languagechange', () => { hudKey = ''; if (running && world) updateHud(true); });
-
-  // 给调试 / 其他脚本留一个小接口
-  window.siteCorridor = {
-    advance, back: () => advance(-1), openCurrent,
-    get state() { return { running, stop: nav.stop, target: nav.target, stops: world ? world.stopS.length : 0, s: cam.s, moving: moving() }; }
-  };
 
   sync();
 })();
