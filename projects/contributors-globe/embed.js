@@ -119,6 +119,9 @@
     selectWork: function (workId) {
       send({ type: 'gongshui:contributors-globe:select-work', workId: String(workId || '') });
     },
+    setNight: function (enabled) {
+      send({ type: 'gongshui:contributors-globe:set-night', enabled: !!enabled });
+    },
     setLanguage(language) {
       const lang = String(language || '').trim();
       if (lang) send({ type: 'gongshui:embed:language', lang });
