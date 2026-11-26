@@ -36,7 +36,7 @@ jobs:
           node --check projects/navigation-interaction/scripts/navigation.js
       - name: Check project boundaries and required assets
         run: |
-          ! grep -Eq 'AppState|localStorage|preview-card|siteI18n|siteCorridor|is-bookmarks|mario-nav' projects/bookmark-hall/scripts/bookmarks-corridor.js
+          ! grep -Eq 'AppState|localStorage|preview-card|siteI18n|siteCorridor|is-bookmarks|mario-nav|navEl' projects/bookmark-hall/scripts/bookmarks-corridor.js
           ! grep -Eq 'siteI18n|siteGlobe|preview-card|nav-home' projects/contributors-globe/scripts/globe.js
           ! grep -Eq 'mario-nav|portfolio-live|portfolio-embed|top-bar' projects/navigation-interaction/styles/navigation.css
           ! test -e projects/navigation-interaction/styles/portfolio-works.css
