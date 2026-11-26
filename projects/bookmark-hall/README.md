@@ -43,7 +43,7 @@ hall.onOpen(({ id }) => {
 hall.setItems([{ id: 'only-one', title: '唯一收藏', src: 'https://example.com' }]);
 ```
 
-更新数据时再次调用 `setItems(nextItems)` 即可。默认最多接收 300 条，可通过 `data-max-items="500"` 调整，上限 1000。传入空数组会显示空状态。
+更新数据时再次调用 `setItems(nextItems)` 即可。默认最多接收 300 条，可通过 `data-max-items="100"` 降低，上限 300。传入空数组会显示空状态。
 
 ## 数据字段
 
@@ -64,7 +64,7 @@ hall.setItems([{ id: 'only-one', title: '唯一收藏', src: 'https://example.co
 |---|---:|---|
 | `data-icons` | `1` | `0` 隐藏返回/关闭按钮中的图标，保留必要交互 |
 | `data-controls` | `1` | `0` 隐藏整组 HUD 控件 |
-| `data-max-items` | `300` | 收藏数量上限，最大 1000 |
+| `data-max-items` | `300` | 收藏数量上限，最大 300 |
 | `data-width` | `100%` | 容器宽度 |
 | `data-height` | 自动 | 指定容器高度 |
 | `data-ratio` | `1.6439` | 自动高度时的宽高比 |
