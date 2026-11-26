@@ -65,3 +65,13 @@ API：`select(index)`、`onSelect(callback)`、`reset()`、`setLanguage(lang)`�
 ## 使用许可
 
 项目 3–5 各自有独立的 MIT 源代码许可证，详见各目录 `LICENSE`。MIT 仅覆盖各项目作者拥有的原创代码/样式；投稿者个人数据、第三方图片/贴图/图标/地理数据和依赖库不自动纳入该授权。使用者应查看对应的第三方声明，并对自己传入的内容拥有展示权。
+
+## English overview
+
+Projects 3–5 can be installed with a single `<script>` tag; each loader creates a mount element automatically. Use `data-target` when you want to provide your own container. Each generated element exposes a project-specific `.gongshuiEmbed` API with a `ready` promise and `destroy()` lifecycle method.
+
+- **Contributors Globe:** `data-pins="0"`, `data-search="0"`, and `data-controls="0"` produce a clean globe. `data-flag="0"` hides only the flag submission link.
+- **Bookmark Hall:** call `setItems(array)` after `await api.ready`. A one-item array and multi-item arrays are both supported; the default maximum is 300.
+- **Navigation Interaction:** use `data-sample="7"` for one button or `data-samples="0,2,7"` for a subset of the 24 buttons.
+
+See each project's README for copy/paste examples, complete options, data schemas, callbacks, and license boundaries.
