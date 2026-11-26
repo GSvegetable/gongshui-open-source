@@ -962,6 +962,18 @@
   window.addEventListener('message', event => {
     if (window.parent === window || !hostOrigin || event.source !== window.parent || event.origin !== hostOrigin) return;
     const message = event.data;
-    if (message && message.type === 'gongshui:contributors-globe:select-work' && typeof message.workId === 'string') window.ContributorsGlobe.selectWork(message.workId);
+    if (!message || typeof message !== 'object') return;
+    if (message.type === 'gongshui:embed:language' && typeof message.lang === 'string') {
+      const language = message.lang.slice(0, 16);
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', language);
+      window.history.replaceState(window.history.state, '', url);
+      document.documentElement.lang = language;
+      refreshText();
+      return;
+    }
+    if (message.type === 'gongshui:contributors-globe:select-work' && typeof message.workId === 'string') {
+      window.ContributorsGlobe.selectWork(message.workId);
+    }
   });
 })();

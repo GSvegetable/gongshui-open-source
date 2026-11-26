@@ -57,6 +57,13 @@ jobs:
           grep -q 'gongshui:embed:ready' projects/contributors-globe/embed.js
           grep -q 'gongshui:embed:ready' projects/bookmark-hall/embed.js
           grep -q 'gongshui:embed:ready' projects/navigation-interaction/embed.js
+          grep -q 'setLanguage' projects/contributors-globe/embed.js
+          grep -q 'setLanguage' projects/bookmark-hall/embed.js
+          grep -q 'setLanguage' projects/navigation-interaction/embed.js
+          grep -q 'gongshui:embed:language' projects/contributors-globe/scripts/globe.js
+          grep -q 'gongshui:embed:language' projects/bookmark-hall/scripts/bookmarks-corridor.js
+          grep -q 'gongshui:embed:language' projects/navigation-interaction/scripts/navigation.js
+          ! grep -q "postMessage(.*'\*'" projects/bookmark-hall/scripts/bookmarks-corridor.js
       - name: Check navigation specimen count
         run: |
           count=$(grep -o 'data-nav-sample=' projects/navigation-interaction/index.html | wc -l)
