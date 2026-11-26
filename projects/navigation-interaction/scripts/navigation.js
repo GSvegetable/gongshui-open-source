@@ -18,6 +18,8 @@
   const columns = Math.max(1, Math.min(buttons.length || 1, Number(params.get('columns')) || Math.min(6, buttons.length || 1)));
   grid.style.gridTemplateColumns = 'repeat(' + columns + ', minmax(0, 1fr))';
   if (params.has('gap')) grid.style.gap = Math.max(0, Math.min(48, Number(params.get('gap')) || 0)) + 'px';
+  const buttonSize = Number(params.get('button-size'));
+  if (Number.isFinite(buttonSize) && buttonSize > 0) grid.style.setProperty('--nav-button-size', Math.max(24, Math.min(128, buttonSize)) + 'px');
   const showcase = grid.closest('.nav-showcase');
   if (showcase) {
     showcase.classList.toggle('is-filtered', !!allowed);

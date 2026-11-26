@@ -32,10 +32,19 @@
 
   slot.setAttribute('data-gongshui-embed', 'navigation-interaction');
   slot.style.display = slot.style.display || 'block';
-  slot.style.width = script.getAttribute('data-width') || slot.style.width || '100%';
+  const requestedSamples = (script.getAttribute('data-samples') || '').split(',').map(value => value.trim()).filter(Boolean);
+  const singleSample = script.hasAttribute('data-sample') || requestedSamples.length === 1;
+  const requestedButtonSize = Number(script.getAttribute('data-button-size'));
+  const buttonSize = Number.isFinite(requestedButtonSize) && requestedButtonSize > 0 ? Math.max(24, Math.min(128, requestedButtonSize)) : 48;
+  const singleMountSize = (buttonSize + 36) + 'px';
+  slot.style.width = script.getAttribute('data-width') || slot.style.width || (singleSample ? singleMountSize : '100%');
 
   if (script.hasAttribute('data-height')) {
     slot.style.height = script.getAttribute('data-height');
+  } else if (singleSample && !slot.hasAttribute('data-embed-fill') && !slot.style.height) {
+    slot.style.height = singleMountSize;
+    slot.style.aspectRatio = '1';
+    slot.style.minHeight = '0';
   } else if (!slot.hasAttribute('data-embed-fill') && !slot.style.height) {
     slot.style.aspectRatio = script.getAttribute('data-ratio') || '1.6439';
     slot.style.minHeight = script.getAttribute('data-min-height') || '280px';
@@ -48,7 +57,7 @@
   frameUrl.searchParams.set('embed', '1');
   const initialLanguage = script.getAttribute('data-lang') || document.documentElement.lang;
   if (initialLanguage) frameUrl.searchParams.set('lang', initialLanguage);
-  ['sample', 'samples', 'columns', 'gap'].forEach(key => {
+  ['sample', 'samples', 'columns', 'gap', 'button-size'].forEach(key => {
     const value = script.getAttribute('data-' + key);
     if (value !== null) frameUrl.searchParams.set(key, value);
   });

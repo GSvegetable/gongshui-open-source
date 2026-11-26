@@ -41,6 +41,7 @@ Version: **1.2.0**
 | `data-samples` | 无 | 只显示指定按钮，例如 `0,7,14` |
 | `data-columns` | 自动 | 网格列数 |
 | `data-gap` | 样式默认 | 按钮间距（像素，0–48） |
+| `data-button-size` | 自适应 | 单个按钮尺寸（像素，24–128） |
 | `data-width` | `100%` | 容器宽度 |
 | `data-height` | 自动 | 容器高度 |
 | `data-ratio` | `1.6439` | 自动高度时的宽高比 |
@@ -74,6 +75,6 @@ Embed one sample with a single script tag (sample indices are zero-based):
 <script src="https://gsvegetable.github.io/gongshui-open-source/navigation-interaction/embed.js" data-sample="7"></script>
 ```
 
-Embed a subset with `data-samples="0,2,7,14"`, or omit the filter to show all 24 samples. Filtered embeds remove the showcase heading/footer so the buttons work as standalone UI components. Await `api.ready`, use `api.select(index)`, subscribe with `api.onSelect(callback)`, and call `api.reset()` or `api.destroy()` as needed.
+Embed a subset with `data-samples="0,2,7,14"`, or omit the filter to show all 24 samples. A single-sample embed defaults to a compact 84 × 84 px mount; set `data-width`, `data-height`, or `data-button-size` to customize it. Filtered embeds remove the showcase heading/footer so the buttons work as standalone UI components. Await `api.ready`, use `api.select(index)`, subscribe with `api.onSelect(callback)`, and call `api.reset()` or `api.destroy()` as needed.
 
 The project-level MIT license covers the original component source, sample markup, and authored styles.
