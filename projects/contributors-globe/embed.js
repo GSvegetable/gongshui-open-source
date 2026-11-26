@@ -55,6 +55,14 @@
     if (value !== null) frameUrl.searchParams.set(key, value);
   });
 
+  const contributorsSrc = script.getAttribute('data-contributors-src');
+  if (contributorsSrc) {
+    try {
+      const url = new URL(contributorsSrc, document.baseURI);
+      if (url.protocol === 'https:' && !url.username && !url.password) frameUrl.searchParams.set('data', url.href);
+    } catch (_) { /* Invalid or non-HTTPS data sources are ignored. */ }
+  }
+
   const submitUrl = script.getAttribute('data-submit-url');
   if (submitUrl) {
     try {
