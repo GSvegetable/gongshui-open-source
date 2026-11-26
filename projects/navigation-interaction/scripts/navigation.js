@@ -38,7 +38,7 @@
     });
 
     if (notifyParent) {
-      const detail = { index: selectedIndex, label: buttons[selectedIndex].getAttribute('aria-label') || '' };
+      const detail = { index: selectedIndex, label: allButtons[selectedIndex].getAttribute('aria-label') || '' };
       window.dispatchEvent(new CustomEvent('navigation-interaction:select', { detail }));
       if (window.parent !== window && parentOrigin) {
         window.parent.postMessage({ type: 'gongshui:navigation-interaction:select', ...detail }, parentOrigin);
