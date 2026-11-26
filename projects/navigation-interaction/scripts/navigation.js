@@ -66,6 +66,10 @@
     if (window.parent === window || !parentOrigin || event.source !== window.parent || event.origin !== parentOrigin) return;
     const message = event.data;
     if (!message || typeof message !== 'object') return;
+    if (message.type === 'gongshui:navigation-interaction:reset') {
+      resetSelection();
+      return;
+    }
     if (message.type === 'gongshui:embed:language' && typeof message.lang === 'string') {
       document.documentElement.lang = message.lang.slice(0, 16);
       return;
