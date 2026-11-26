@@ -14,7 +14,6 @@
 (() => {
   'use strict';
 
-  const REPO = 'GSvegetable/gongshui-open-source';
   // 资源全部内置在仓库里：不依赖 unpkg / flagcdn，国内网络打开也能正常显示
   const GLOBE_LIB = 'https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js';
   const IMG = './assets/earth/';
@@ -176,19 +175,6 @@
     s.onerror = () => { delete loadedScripts[src]; reject(new Error('脚本加载失败：' + src)); };
     document.head.appendChild(s);
   }));
-
-  const issueUrl = () => {
-    const text = [
-      '## 投稿插旗',
-      '',
-      '- 显示名：',
-      '- 国家代码（如 CN）：',
-      '- GitHub 用户名（可选）：',
-      '- 位置（可选，城市或经纬度）：',
-      '- 一句话（可选）：'
-    ].join('\n');
-    return 'https://github.com/' + REPO + '/issues/new?title=' + encodeURIComponent('投稿插旗') + '&body=' + encodeURIComponent(text);
-  };
 
   /* ---------- 状态 ---------- */
   let view = null, stage = null, statusBox = null, card = null, roster = null, dayBtn = null;
@@ -512,11 +498,15 @@
     if (showControls) tools.appendChild(dayBtn);
 
     cta = el('a', 'globe-btn globe-btn--cta globe-btn--icon');
-    cta.href = issueUrl(); cta.target = '_blank'; cta.rel = 'noopener noreferrer';
-    cta.setAttribute('aria-label', tr('globe.cta.title', '在 GitHub 上提交插旗，作者会把你的旗子插上去'));
-    cta.title = tr('globe.cta.title', '在 GitHub 上提交插旗，作者会把你的旗子插上去');
-    cta.appendChild(icon(ICON_FLAG));
-    if (showControls && EMBED_OPTIONS.get('flag') !== '0') tools.appendChild(cta);
+    const submitUrl = EMBED_OPTIONS.get('submit') || '';
+    const isValidSubmitUrl = /^https:\/\//i.test(submitUrl);
+    if (isValidSubmitUrl) {
+      cta.href = submitUrl; cta.target = '_blank'; cta.rel = 'noopener noreferrer';
+      cta.setAttribute('aria-label', tr('globe.cta.title', '提交投稿'));
+      cta.title = tr('globe.cta.title', '提交投稿');
+      cta.appendChild(icon(ICON_FLAG));
+      if (showControls && EMBED_OPTIONS.get('flag') !== '0') tools.appendChild(cta);
+    }
     if (tools.childElementCount) dock.appendChild(tools);
     if (showControls || showSearch) view.appendChild(dock);
     host.appendChild(view);
