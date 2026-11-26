@@ -74,7 +74,8 @@
      2. 文案（中 / 英 / 日；作品标题与简介直接读页面上已翻译的 DOM）
      --------------------------------------------------------- */
   const lang = () => {
-    const s = String(document.documentElement.lang || 'zh').toLowerCase();
+    const query = new URLSearchParams(window.location.search).get('lang');
+    const s = String(query || document.documentElement.lang || 'zh').toLowerCase();
     return s.startsWith('en') ? 'en' : s.startsWith('ja') ? 'ja' : 'zh';
   };
   const TEXT = {
@@ -1272,7 +1273,18 @@
   window.addEventListener('message', event => {
     if (window.parent === window || !parentOrigin || event.source !== window.parent || event.origin !== parentOrigin) return;
     const msg = event.data;
-    if (!msg || msg.type !== 'gongshui:bookmark-hall:data' || !Array.isArray(msg.items)) return;
+    if (!msg || typeof msg !== 'object') return;
+    if (msg.type === 'gongshui:embed:language' && typeof msg.lang === 'string') {
+      const language = msg.lang.slice(0, 16);
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', language);
+      window.history.replaceState(window.history.state, '', url);
+      document.documentElement.lang = language;
+      hudKey = '';
+      if (running && world) updateHud(true);
+      return;
+    }
+    if (msg.type !== 'gongshui:bookmark-hall:data' || !Array.isArray(msg.items)) return;
     hostItems = msg.items.slice(0, 300);
     if (running && refreshData(true)) updateHud(true);
   });

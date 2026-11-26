@@ -19,7 +19,7 @@ Each project owns its implementation, assets, tests, version, changelog and depe
 
 ## Embed standard
 
-All five projects provide standalone pages and reusable `embed.js` loaders for isolated iframe embedding. Projects 3–5 expose a container-level `gongshuiEmbed` API and validated event subscriptions; see [Embed API guide](EMBEDDING.md).
+All five projects provide standalone pages and an `embed.js` integration entry. Pixel Daylight Switch mounts its component runtime directly; Pixel Orbit uses a showcase iframe loader; Projects 3–5 use the common isolated iframe loader and a container-level `gongshuiEmbed` API. See [Embed API guide](EMBEDDING.md).
 
 ## Host / artwork boundary
 
