@@ -57,17 +57,24 @@ const SCRUB_K = 120;
 const SCRUB_C = 21.9;
 
 /** 后轨（左，深青灰）= 偶数序号卡片，前轨（右，暖米白）= 奇数序号卡片。 */
+/**
+ * 起始状态。
+ * 嵌入时宿主把它嵌在一个大画框里，默认停在 RIGHT —— 这一态的构图最完整：
+ * 两轨卡片在右边成列，左边是「AI AGENT / WATER SYSTEM / RIPPLE」那几行大字。
+ */
+const START_PRESET = EMBED ? 2 : INITIAL_PRESET;
+
 const state = {
   layout: null,
-  presetIndex: INITIAL_PRESET,
+  presetIndex: START_PRESET,
   transition: null,
   scrub: null,
   // 三个状态量：peak 单位 dp，tilt 为原生读数
-  peak: PRESETS[INITIAL_PRESET].peak,
+  peak: PRESETS[START_PRESET].peak,
   peakV: 0,
-  curve: PRESETS[INITIAL_PRESET].curve,
+  curve: PRESETS[START_PRESET].curve,
   curveV: 0,
-  tilt: PRESETS[INITIAL_PRESET].tilt,
+  tilt: PRESETS[START_PRESET].tilt,
   tiltV: 0,
   trackShift: 0,
   trackShiftV: 0,
