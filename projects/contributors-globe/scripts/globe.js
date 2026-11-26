@@ -497,7 +497,7 @@
     searchWrap.addEventListener('click', expandSearch);
     searchWrap.appendChild(searchInput);
     searchCol.appendChild(searchWrap);
-    dock.appendChild(searchCol);
+    if (showSearch) dock.appendChild(searchCol);
 
     // 右下：看夜晚 / 插旗，只保留图标
     const tools = el('div', 'globe-tools');
@@ -508,15 +508,16 @@
     dayBtn.title = tr('globe.night', '看夜晚');
     dayBtn.appendChild(icon(ICON_MOON));
     dayBtn.addEventListener('click', toggleNight);
-    tools.appendChild(dayBtn);
+    if (showControls) tools.appendChild(dayBtn);
 
     cta = el('a', 'globe-btn globe-btn--cta globe-btn--icon');
     cta.href = issueUrl(); cta.target = '_blank'; cta.rel = 'noopener noreferrer';
     cta.setAttribute('aria-label', tr('globe.cta.title', '在 GitHub 上提交插旗，作者会把你的旗子插上去'));
     cta.title = tr('globe.cta.title', '在 GitHub 上提交插旗，作者会把你的旗子插上去');
     cta.appendChild(icon(ICON_FLAG));
-    tools.appendChild(cta);
-    dock.appendChild(tools);
+    if (EMBED_OPTIONS.get('flag') !== '0') tools.appendChild(cta);
+    if (tools.childElementCount) dock.appendChild(tools);
+    if (showControls || showSearch) view.appendChild(dock);
 
     view.appendChild(dock);
     host.appendChild(view);
@@ -689,7 +690,7 @@
     g = window.Globe({ animateIn: true })(stage)
       .width(stage.clientWidth).height(stage.clientHeight)
       .showAtmosphere(true).atmosphereColor('#8fb8ff').atmosphereAltitude(pixelTex ? 0.12 : 0.18)
-      .htmlElementsData(list)
+      .htmlElementsData(showPins ? list : [])
       .htmlLat(d => d.plotLat).htmlLng(d => d.plotLng).htmlAltitude(0.012)
       .htmlElement(d => d.el);
     if (typeof g.htmlTransitionDuration === 'function') g.htmlTransitionDuration(0);
@@ -953,6 +954,11 @@
     const target = contributors.find(c => c.works.includes(id)) || contributors[0];
     if (target) select(target, true);
   }
+
+  const EMBED_OPTIONS = new URLSearchParams(window.location.search);
+  const showPins = EMBED_OPTIONS.get('pins') !== '0';
+  const showControls = EMBED_OPTIONS.get('controls') !== '0';
+  const showSearch = EMBED_OPTIONS.get('search') !== '0';
 
   const hostOrigin = (() => { try { return document.referrer ? new URL(document.referrer).origin : ''; } catch (_) { return ''; } })();
   window.ContributorsGlobe = {
