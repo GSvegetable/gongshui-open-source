@@ -58,7 +58,7 @@ hall.setItems([itemA, itemB, itemC, itemD]);
 
 ## Navigation Interaction
 
-只取一个按钮：`data-sample="7"`。多个按钮：`data-samples="0,2,7,14"`。完整展示不传筛选属性。索引始终对应原始 0–23 样本编号。
+只取一个按钮：`data-sample="7"`。单按钮默认紧凑为 84×84 px；可用 `data-button-size` 调整按钮本体尺寸。多个按钮：`data-samples="0,2,7,14"`。完整展示不传筛选属性。索引始终对应原始 0–23 样本编号。
 
 API：`select(index)`、`onSelect(callback)`、`reset()`、`setLanguage(lang)`、`ready`、`destroy()`。
 
