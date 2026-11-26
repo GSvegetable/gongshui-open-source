@@ -18,7 +18,14 @@
   const GLOBE_LIB = 'https://cdn.jsdelivr.net/npm/globe.gl@2.46.2/dist/globe.gl.min.js';
   const IMG = './assets/earth/';
   const COUNTRY_GEOJSON = './data/ne_110m_admin_0_countries.geojson';
-  const DATA_URL = './data/contributors.json';
+  const DATA_URL = (() => {
+    const configured = new URLSearchParams(window.location.search).get('data');
+    if (!configured) return './data/contributors.json';
+    try {
+      const url = new URL(configured, window.location.href);
+      return url.protocol === 'https:' && !url.username && !url.password ? url.href : './data/contributors.json';
+    } catch (_) { return './data/contributors.json'; }
+  })();
   const FLAG_DIR = './assets/flags/';
   const GLOBE_R = 100; // globe.gl 里地球半径固定是 100
 
