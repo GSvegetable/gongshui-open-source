@@ -14,12 +14,13 @@ This repository is the source of truth for the implementations of all independen
 | 3 | Contributors Globe | `projects/contributors-globe/` | `/contributors-globe/` | 1.1.0 |
 | 4 | The Bookmark Hall | `projects/bookmark-hall/` | `/bookmark-hall/` | 1.1.0 |
 | 5 | Navigation Interaction System | `projects/navigation-interaction/` | `/navigation-interaction/` | 1.1.0 |
+| 6 | Eight Components | `projects/eight-components/` | `/eight-components/` | 2.0.0 |
 
 Each project owns its implementation, assets, tests, version, changelog and dependency notices. There is no monorepo-wide product version or blanket license. The first two projects retain their existing licensing terms. The migrated projects retain the original author's copyright unless a specific third-party license applies; do not infer a broad reuse license.
 
 ## Embed standard
 
-All five projects provide standalone pages and an `embed.js` integration entry. Pixel Daylight Switch mounts its component runtime directly; Pixel Orbit uses a showcase iframe loader; Projects 3–5 use the common isolated iframe loader and a container-level `gongshuiEmbed` API. See [Embed API guide](EMBEDDING.md).
+All six projects provide standalone pages and an `embed.js` integration entry. Pixel Daylight Switch mounts its component runtime directly; Pixel Orbit uses a showcase iframe loader; Projects 3–5 use the common isolated iframe loader and a container-level `gongshuiEmbed` API. See [Embed API guide](EMBEDDING.md).
 
 ## Host / artwork boundary
 
@@ -51,7 +52,9 @@ This project is an independent 24-button interaction specimen with a public `sel
 The root workflow `.github/workflows/deploy-project-sites.yml` assembles the published Pages site:
 - `projects/pixel-orbit/` → site root (preserves existing URLs);
 - `projects/pixel-daylight-switch/` → `/pixel-daylight-switch/`;
-- the three extracted projects → `/contributors-globe/`, `/bookmark-hall/`, and `/navigation-interaction/`.
+- the extracted projects → `/contributors-globe/`, `/bookmark-hall/`, and `/navigation-interaction/`;
+- `projects/eight-components/` → `/eight-components/`, with `projects/seven-components/` kept as a
+  redirect shim so the previous URL and embed script keep working.
 
 Do not point website iframes at `/projects/...`; that prefix is source-only and is not part of the deployed URL.
 

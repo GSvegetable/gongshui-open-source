@@ -1,0 +1,6 @@
+three.js r128
+https://github.com/mrdoob/three.js
+Copyright (c) 2010-2021 three.js authors
+SPDX-License-Identifier: MIT
+
+The bundled file vendor/three.min.js carries the upstream license header.

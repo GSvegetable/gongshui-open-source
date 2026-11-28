@@ -10,6 +10,7 @@ on:
       - "projects/bookmark-hall/**"
       - "projects/navigation-interaction/**"
       - "projects/3-sy/**"
+      - "projects/eight-components/**"
       - "projects/seven-components/**"
       - ".github/workflows/deploy-project-sites.yml"
   workflow_dispatch:
@@ -54,13 +55,14 @@ jobs:
       - name: Assemble all project sites
         run: |
           rm -rf _site
-          mkdir -p _site/pixel-daylight-switch _site/contributors-globe _site/bookmark-hall _site/navigation-interaction _site/3-sy _site/seven-components
+          mkdir -p _site/pixel-daylight-switch _site/contributors-globe _site/bookmark-hall _site/navigation-interaction _site/3-sy _site/eight-components _site/seven-components
           cp -a projects/pixel-orbit/. _site/
           cp -a projects/pixel-daylight-switch/. _site/pixel-daylight-switch/
           cp -a projects/contributors-globe/. _site/contributors-globe/
           cp -a projects/bookmark-hall/. _site/bookmark-hall/
           cp -a projects/navigation-interaction/. _site/navigation-interaction/
           cp -a projects/3-sy/dist/. _site/3-sy/
+          cp -a projects/eight-components/. _site/eight-components/
           cp -a projects/seven-components/. _site/seven-components/
           touch _site/.nojekyll
 
@@ -69,6 +71,9 @@ jobs:
           test -s _site/contributors-globe/index.html
           test -s _site/bookmark-hall/index.html
           test -s _site/navigation-interaction/index.html
+          test -s _site/eight-components/index.html
+          test -s _site/eight-components/embed.js
+          test -s _site/eight-components/vendor/three.min.js
           test -s _site/seven-components/index.html
           test -s _site/contributors-globe/data/contributors.json
           test -s _site/contributors-globe/data/ne_110m_admin_0_countries.geojson

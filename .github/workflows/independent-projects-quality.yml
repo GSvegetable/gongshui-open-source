@@ -6,6 +6,7 @@ on:
       - "projects/contributors-globe/**"
       - "projects/bookmark-hall/**"
       - "projects/navigation-interaction/**"
+      - "projects/eight-components/**"
       - ".github/workflows/independent-projects-quality.yml"
   push:
     branches: [main]
@@ -13,6 +14,7 @@ on:
       - "projects/contributors-globe/**"
       - "projects/bookmark-hall/**"
       - "projects/navigation-interaction/**"
+      - "projects/eight-components/**"
       - ".github/workflows/independent-projects-quality.yml"
 
 permissions:
@@ -34,6 +36,10 @@ jobs:
           node --check projects/contributors-globe/scripts/globe.js
           node --check projects/bookmark-hall/scripts/bookmarks-corridor.js
           node --check projects/navigation-interaction/scripts/navigation.js
+          node --check projects/eight-components/embed.js
+          node --check projects/eight-components/scripts/core.js
+          node --check projects/eight-components/scripts/controls.js
+          node --check projects/eight-components/scripts/press-key.js
       - name: Check project boundaries and required assets
         run: |
           ! grep -Eq 'AppState|localStorage|preview-card|siteI18n|siteCorridor|is-bookmarks|mario-nav|navEl' projects/bookmark-hall/scripts/bookmarks-corridor.js
@@ -89,6 +95,30 @@ jobs:
           grep -q 'gongshui:embed:language' projects/bookmark-hall/scripts/bookmarks-corridor.js
           grep -q 'gongshui:embed:language' projects/navigation-interaction/scripts/navigation.js
           ! grep -q "postMessage(.*'\*'" projects/bookmark-hall/scripts/bookmarks-corridor.js
+      - name: Check Eight Components project
+        run: |
+          test -s projects/eight-components/index.html
+          test -s projects/eight-components/embed.js
+          test -s projects/eight-components/README.md
+          test -s projects/eight-components/LICENSE
+          test -s projects/eight-components/styles/sheet.css
+          test -s projects/eight-components/styles/controls.css
+          test -s projects/eight-components/scripts/core.js
+          test -s projects/eight-components/scripts/controls.js
+          test -s projects/eight-components/scripts/press-key.js
+          test -s projects/eight-components/vendor/three.min.js
+          test -s projects/seven-components/index.html
+          test -s projects/seven-components/embed.js
+          grep -q 'gongshui:embed:ready' projects/eight-components/embed.js
+          grep -q 'const ready = new Promise' projects/eight-components/embed.js
+          grep -q 'gongshui:embed:theme' projects/eight-components/embed.js
+          grep -q "data-gongshui-embed', 'eight-components'" projects/eight-components/embed.js
+          grep -q 'prefers-reduced-motion' projects/eight-components/styles/sheet.css
+          grep -q 'data-theme="dark"' projects/eight-components/styles/sheet.css
+          count=$(grep -o 'class="plate"' projects/eight-components/index.html | wc -l)
+          test "$count" -eq 8
+          grep -q 'eight-components' projects/seven-components/embed.js
+
       - name: Check navigation specimen count
         run: |
           count=$(grep -o 'data-nav-sample=' projects/navigation-interaction/index.html | wc -l)

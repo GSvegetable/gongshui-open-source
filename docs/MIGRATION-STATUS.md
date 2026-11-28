@@ -11,8 +11,9 @@ Updated: 2026-11-26
 | Contributors Globe | `projects/contributors-globe/` | `index.html` | project-owned contributor data and assets; optional origin-checked host selection message |
 | The Bookmark Hall | `projects/bookmark-hall/` | `index.html` | receives normalized bookmark records through parent postMessage; no website storage or globals |
 | Navigation Interaction System | `projects/navigation-interaction/` | `index.html` | none; independent 24-button specimen |
+| Eight Components | `projects/eight-components/` | `index.html` | none; independent 8-component specimen with a documented `embed=1` contact-sheet layout |
 
-The first two works remain in `projects/pixel-daylight-switch/` and `projects/pixel-orbit/`. All five works now have one source of truth in this repository.
+The first two works remain in `projects/pixel-daylight-switch/` and `projects/pixel-orbit/`. All works now have one source of truth in this repository.
 
 ## Website platform responsibilities
 
@@ -27,8 +28,9 @@ The blank bookmark navigation handoff page remains a website platform page. It i
 - Contributors Globe: `/contributors-globe/`
 - The Bookmark Hall: `/bookmark-hall/`
 - Navigation Interaction System: `/navigation-interaction/`
+- Eight Components: `/eight-components/` (previously `/seven-components/`, which now redirects)
 
-The Pages deployment workflow assembles all five projects while preserving the existing first-two URLs.
+The Pages deployment workflow assembles every project while preserving the existing URLs.
 
 ## Completed integration and verification
 
