@@ -1,845 +1,388 @@
-/* ============================================================
-   八个组件 —— 物件样式
-   每件物件都遵守同一套约定：
-   · 光从左上来（高光在左上，投影落向右下）
-   · 材质只有四种：陶瓷 / 黄铜 / 漆面 / 玻璃
-   · 弹性都用同一条曲线，只是刚度不同
-   ============================================================ */
+/* Eight Components v3 — the eight objects. */
 
-/* ============================================================
-   通用零件：读数与小按钮
-   ============================================================ */
-
-.plate-object--stack {
-  grid-template-rows: auto 1fr;
-  align-content: center;
-  gap: 10px;
-  width: 100%;
-}
-
-.plate-object--row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 26px;
-}
-
-.string-object {
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-}
-
-.jar-object {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-}
-
-.jar-side { display: grid; gap: 14px; justify-items: center; }
-.jar-buttons { display: flex; gap: 8px; }
-
-/* 物件在嵌入模式下按格子大小等比缩放 */
-.object { transform: scale(var(--fit, 1)); transform-origin: center center; }
-
-.readout {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  justify-self: center;
-  font: 600 21px/1 var(--mono);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .02em;
-  color: var(--ink);
-}
-
-.readout small {
-  font: 500 9px/1 var(--mono);
-  letter-spacing: .16em;
-  color: var(--ink-3);
-}
-
-.mini-btn {
-  height: 32px;
-  padding: 0 13px;
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--ink-2);
-  font: 600 11px/1 var(--mono);
-  letter-spacing: .08em;
-  cursor: pointer;
-  transition: border-color var(--t-1) var(--ease-out), color var(--t-1) var(--ease-out),
-    transform 120ms var(--ease-out), background var(--t-1) var(--ease-out);
-}
-
-.mini-btn:hover { border-color: var(--ink-3); color: var(--ink); background: var(--rule-soft); }
-.mini-btn:active { transform: scale(.94); }
-
-/* ============================================================
-   01 压印 · HOLD  —— 陶瓷圆片 + 刻线环
-   ============================================================ */
-
-.plunger {
+/* ───── 01 HOLD ───── */
+.hold {
+  --p: 0;
   position: relative;
-  width: 138px;
-  height: 138px;
+  width: 136px;
+  height: 136px;
   padding: 0;
   border: 0;
-  background: none;
-  cursor: pointer;
-  isolation: isolate;
-}
-
-.plunger-disc {
-  position: absolute;
-  inset: 0;
   border-radius: 50%;
-  background:
-    radial-gradient(74% 74% at 32% 21%, #fffdf6, var(--bone) 40%, var(--bone-2) 92%);
-  box-shadow:
-    0 16px 26px -12px rgba(64, 50, 22, .42),
-    0 3px 5px var(--cast-soft),
-    inset 0 1px 0 var(--sheen),
-    inset 0 -4px 10px rgba(70, 56, 30, .18);
-  transition: transform var(--t-1) var(--ease-out), box-shadow var(--t-1) var(--ease-out);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
-
-.plunger.is-down .plunger-disc {
-  transform: translateY(3px) scale(.982);
-  box-shadow:
-    0 5px 10px -7px rgba(64, 50, 22, .5),
-    0 1px 2px var(--cast-soft),
-    inset 0 1px 0 var(--sheen),
-    inset 0 -4px 10px rgba(70, 56, 30, .18);
-}
-
-.plunger-ring {
+.hold-ring {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
-  pointer-events: none;
+  transform: rotate(-90deg);
 }
-
-.plunger-ring .groove-light {
+.hold-track { fill: none; stroke: var(--off); stroke-width: 6; }
+.hold-prog {
   fill: none;
-  stroke: rgba(255, 255, 255, .9);
-  stroke-width: 1.6;
-}
-
-.plunger-ring .track {
-  fill: none;
-  stroke: rgba(84, 74, 48, .34);
-  stroke-width: 2.6;
-}
-
-.plunger-ring .progress {
-  fill: none;
-  stroke: var(--lacquer);
-  stroke-width: 3.4;
+  stroke: var(--tone);
+  stroke-width: 6;
   stroke-linecap: round;
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  transform: rotate(-90deg);
-  transform-origin: 69px 69px;
-}
-
-.plunger-ring .wet {
-  fill: var(--lacquer);
-  transform-origin: 69px 69px;
-  transform: rotate(calc(var(--p, 0) * 360deg));
   opacity: 0;
-  transition: opacity var(--t-1) var(--ease-out);
 }
-
-.plunger.is-holding .plunger-ring .wet { opacity: 1; }
-
-.plunger-face {
+.hold-core {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  gap: 3px;
-  text-align: center;
-  font: 600 14px/1.34 var(--serif);
-  letter-spacing: .12em;
-  color: var(--ink);
-  pointer-events: none;
-  transition: color var(--t-2) var(--ease-out);
-}
-
-.plunger-face small {
-  font: 500 8.5px/1 var(--mono);
-  letter-spacing: .22em;
-  color: var(--ink-3);
-}
-
-.plunger.is-done .plunger-face { color: var(--lacquer); }
-
-.plunger-seal {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
+  inset: 13px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: radial-gradient(72% 72% at 36% 30%, var(--lacquer-hi), var(--lacquer) 58%, var(--lacquer-lo));
-  color: #fdf1e4;
-  font: 700 20px/1 var(--serif);
-  box-shadow: 0 6px 14px -6px rgba(120, 30, 15, .5), inset 0 1px 0 rgba(255, 255, 255, .3);
-  opacity: 0;
-  transform: scale(1.7) rotate(-16deg);
-  pointer-events: none;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tile) 60%, #fff), var(--tile-2));
+  box-shadow: 0 14px 24px -12px rgba(0, 0, 0, .4), 0 2px 0 rgba(255, 255, 255, .7) inset, 0 -3px 8px rgba(0, 0, 0, .06) inset;
+  transform: scale(calc(1 - var(--p) * .09));
+  transition: background .3s, color .3s, box-shadow .3s;
 }
-
-.plunger.is-done .plunger-seal {
-  opacity: 1;
-  transform: scale(1) rotate(-7deg);
-  transition: opacity 180ms var(--ease-out), transform 420ms var(--ease-snap);
+:root[data-theme="dark"] .hold-core {
+  background: linear-gradient(160deg, #2c2c32, #1f1f24);
+  box-shadow: 0 14px 24px -12px #000, 0 1px 0 rgba(255, 255, 255, .08) inset;
 }
-
-/* ============================================================
-   02 拨钮 · TOGGLE —— 黄铜滑槽 + 会被拉长的皮筋
-   ============================================================ */
-
-.toggle-list { display: grid; gap: 20px; justify-items: center; }
-
-.toggle-row {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.toggle-name {
-  font: 500 12.5px/1 var(--sans);
-  color: var(--ink-2);
-  letter-spacing: .04em;
-  white-space: nowrap;
-}
-
-.toggle {
-  position: relative;
-  width: 118px;
-  height: 58px;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  isolation: isolate;
-}
-
-.toggle-bed {
-  position: absolute;
-  inset: 0;
-  border-radius: 29px;
-  background:
-    linear-gradient(180deg, #efe8d6 0%, #ded5bf 52%, #c6bda5 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(88, 72, 42, .28),
-    inset 0 -1px 0 rgba(255, 255, 255, .7),
-    0 1px 2px rgba(60, 48, 24, .14);
-}
-
-.toggle-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.toggle-cord {
-  fill: none;
-  stroke: var(--lacquer);
-  stroke-width: 3.4;
-  stroke-linecap: round;
-  opacity: .92;
-}
-
-.toggle-cord-shadow {
-  fill: none;
-  stroke: var(--lacquer-lo);
-  stroke-width: 3.4;
-  stroke-linecap: round;
-  opacity: .14;
-  transform: translateY(2.5px);
-}
-
-.toggle-post {
-  fill: var(--brass);
-  stroke: var(--brass-lo);
-  stroke-width: .8;
-}
-
-.toggle-thumb {
-  position: absolute;
-  top: 5px;
-  /* 水平位置完全由 JS 的 transform 控制，避免与 CSS 偏移叠加 */
-  left: 0;
+.hold-label,
+.hold-check { grid-area: 1 / 1; transition: opacity .25s, transform .4s var(--spring); }
+.hold-label { font-size: 18px; font-weight: 800; letter-spacing: .06em; }
+.hold-check {
   width: 48px;
   height: 48px;
-  border-radius: 24px;
-  background:
-    linear-gradient(150deg, #f2e0b4 2%, var(--brass) 46%, var(--brass-lo) 100%);
-  box-shadow:
-    0 4px 9px -3px rgba(52, 40, 16, .45),
-    0 1px 0 rgba(255, 246, 220, .8),
-    inset 0 -2px 4px rgba(60, 44, 14, .3);
-  will-change: transform;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  opacity: 0;
+  transition: stroke-dashoffset .45s .1s ease, opacity .1s;
 }
+.hold.is-done .hold-core { background: var(--tone); box-shadow: 0 14px 28px -10px var(--tone); }
+.hold.is-done .hold-label { opacity: 0; transform: scale(.6); }
+.hold.is-done .hold-check { opacity: 1; stroke-dashoffset: 0; }
+.hold.is-done .hold-prog { stroke: var(--tone); }
 
-.toggle-thumb::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: 50%;
-  background:
-    repeating-conic-gradient(rgba(255, 246, 216, .22) 0 2.4deg, rgba(70, 52, 20, .22) 2.4deg 5deg);
-  -webkit-mask: radial-gradient(circle, transparent 66%, #000 67%);
-  mask: radial-gradient(circle, transparent 66%, #000 67%);
-}
-
-.toggle-text {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font: 600 11px/1 var(--mono);
-  letter-spacing: .12em;
-  color: var(--ink-3);
-  text-shadow:
-    0 0 4px rgba(255, 252, 242, .95),
-    0 0 7px rgba(255, 252, 242, .8),
-    0 1px 0 rgba(255, 255, 255, .6);
-  transition: opacity var(--t-2) var(--ease-out), color var(--t-2) var(--ease-out);
-  pointer-events: none;
-}
-
-.toggle-text.off { right: 15px; }
-.toggle-text.on { left: 15px; color: var(--lacquer); opacity: 0; }
-.toggle[aria-checked="true"] .toggle-text.off { opacity: 0; }
-.toggle[aria-checked="true"] .toggle-text.on { opacity: 1; }
-
-/* ============================================================
-   03 钤印 · STAMP —— 账簿行 + 落下的印
-   ============================================================ */
-
-.ledger {
+/* ───── 02 SWITCH ───── */
+.switch-list { display: grid; gap: 18px; width: 100%; max-width: 236px; }
+.switch-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.switch-name { font-size: 14px; font-weight: 600; }
+.switch {
+  --travel: 36px;
+  --x: 0;
   position: relative;
-  width: 100%;
-  max-width: 400px;
-  padding-left: 22px;
-  border-top: 1px solid var(--rule-soft);
+  flex: none;
+  width: 84px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--off);
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .3s;
 }
-
-.ledger::before {
-  content: "";
+.switch[aria-checked="true"] { background: var(--tone); }
+.switch-thumb {
   position: absolute;
-  left: 8px;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: var(--lacquer);
-  opacity: .22;
+  top: 4px;
+  left: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .25), 0 0 0 .5px rgba(0, 0, 0, .06);
+  transform: translateX(0);
+  transition: transform .5s var(--spring), scale .25s var(--spring);
 }
+.switch[aria-checked="true"] .switch-thumb { transform: translateX(var(--travel)); }
+.switch.is-press .switch-thumb { scale: 1.1 .93; }
+.switch.is-drag { background: color-mix(in srgb, var(--tone) calc(var(--x) * 100%), var(--off)); }
+.switch.is-drag .switch-thumb { transform: translateX(calc(var(--x) * var(--travel))); transition: scale .25s var(--spring); }
 
-.ledger-row {
+/* ───── 03 CHECK ───── */
+.tasks { display: grid; gap: 10px; width: 100%; max-width: 250px; }
+.task {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 4px 14px 2px;
-  border-bottom: 1px solid var(--rule-soft);
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--tile-2);
   cursor: pointer;
-  transition: background var(--t-2) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .2s var(--spring);
 }
-
-.ledger-row:hover { background: var(--rule-soft); }
-
-.ledger-row input {
+.task:active { transform: scale(.97); }
+.task input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.task-box {
+  position: relative;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 2px solid color-mix(in srgb, var(--muted) 55%, transparent);
+  border-radius: 9px;
+  transition: background .2s, border-color .2s;
+}
+.task-box svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  transition: stroke-dashoffset .3s .08s ease;
+}
+.task-box::after {
+  content: "";
   position: absolute;
-  width: 1px;
-  height: 1px;
+  inset: -2px;
+  border: 2px solid var(--tone);
+  border-radius: 9px;
   opacity: 0;
-  margin: 0;
   pointer-events: none;
 }
-
-.ledger-text {
-  position: relative;
-  flex: 1;
-  font-size: 14px;
-  letter-spacing: .02em;
-  color: var(--ink);
-  transition: color var(--t-2) var(--ease-out);
-}
-
-.ledger-text::after {
+.task input:checked ~ .task-box { border-color: var(--tone); background: var(--tone); animation: task-pop .45s var(--spring); }
+.task input:checked ~ .task-box svg { stroke-dashoffset: 0; }
+.task input:checked ~ .task-box::after { animation: task-ring .6s ease-out; }
+.task input:focus-visible ~ .task-box { outline: 2px solid var(--ink); outline-offset: 3px; }
+.task-text { position: relative; font-size: 14px; font-weight: 600; transition: color .25s; }
+.task-text::after {
   content: "";
   position: absolute;
   left: -2px;
   right: -2px;
   top: 54%;
-  height: 1.5px;
-  background: var(--lacquer);
-  opacity: .8;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--tone);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform var(--t-3) var(--ease-out);
+  transition: transform .35s cubic-bezier(.6, 0, .2, 1);
 }
+.task input:checked ~ .task-text { color: var(--muted); }
+.task input:checked ~ .task-text::after { transform: scaleX(1); }
+@keyframes task-pop { 0% { transform: scale(1); } 35% { transform: scale(.78); } 70% { transform: scale(1.16); } 100% { transform: scale(1); } }
+@keyframes task-ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(1.9); } }
 
-.ledger-row input:checked ~ .ledger-text { color: var(--ink-3); }
-.ledger-row input:checked ~ .ledger-text::after { transform: scaleX(1); }
+/* ───── shared readout ───── */
+.readout { font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.readout small { margin-left: 4px; color: var(--muted); font: 600 13px/1 var(--mono); letter-spacing: 0; }
 
-.ledger-box {
-  position: relative;
-  flex: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 5px;
-  box-shadow: inset 0 0 0 1.5px var(--ink-3);
-  transition: box-shadow var(--t-2) var(--ease-out);
-}
-
-.ledger-row input:checked ~ .ledger-box { box-shadow: inset 0 0 0 1.5px var(--lacquer); }
-.ledger-row input:focus-visible ~ .ledger-box { outline: 2px solid var(--lacquer); outline-offset: 3px; }
-
-.ledger-stamp {
-  position: absolute;
-  right: 32px;
-  top: 50%;
-  width: 52px;
-  height: 52px;
-  margin-top: -26px;
-  display: grid;
-  place-items: center;
-  border: 3px solid var(--lacquer);
-  border-radius: 7px;
-  color: var(--lacquer);
-  font: 700 26px/1 var(--serif);
-  opacity: 0;
-  transform: translateY(-34px) scale(1.55) rotate(-14deg);
-  pointer-events: none;
-  filter: url(#ink-rough);
-}
-
-.ledger-stamp b { display: block; transform: scaleY(1.06); }
-
-.ledger-row input:checked ~ .ledger-stamp {
-  opacity: .92;
-  transform: translateY(0) scale(1) rotate(-6deg);
-  transition: opacity 140ms var(--ease-out), transform 460ms var(--ease-snap);
-}
-
-.ledger-row input:not(:checked) ~ .ledger-stamp {
-  opacity: 0;
-  transform: translateY(-26px) scale(1.2) rotate(-10deg);
-  transition: opacity 200ms var(--ease-out), transform 260ms var(--ease-out);
-}
-
-.ledger-ink {
-  position: absolute;
-  right: 32px;
-  top: 50%;
-  width: 52px;
-  height: 52px;
-  margin-top: -26px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(178, 49, 28, .5), transparent 66%);
-  filter: blur(9px);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.ledger-row input:checked ~ .ledger-ink { animation: ink-bloom 620ms var(--ease-out) forwards; }
-
-@keyframes ink-bloom {
-  0% { opacity: 0; transform: scale(.5); }
-  35% { opacity: .8; transform: scale(1.05); }
-  100% { opacity: 0; transform: scale(2.1); }
-}
-
-/* ============================================================
-   04 弦 · STRING —— 琴弦 + 铜枕 + 品位尺
-   ============================================================ */
-
-.string {
-  width: 100%;
-  max-width: 430px;
-  height: auto;
-  overflow: visible;
-  touch-action: none;
-  cursor: grab;
-}
-
+/* ───── 04 STRING ───── */
+.string-wrap { display: grid; justify-items: center; gap: 4px; width: 100%; max-width: 300px; }
+.string { display: block; width: 100%; height: auto; overflow: visible; outline: none; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; }
 .string:active { cursor: grabbing; }
+.string-line { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.string-ghost { fill: none; stroke: var(--tone); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.string-post { fill: var(--off); }
+.string-bead { fill: var(--tone); stroke: var(--tile); stroke-width: 4; paint-order: stroke; }
+.string-tick { stroke: var(--off); stroke-width: 2.4; stroke-linecap: round; transition: stroke .15s; }
+.string-tick.is-on { stroke: var(--tone); }
+.string:focus-visible .string-bead { stroke: var(--ink); }
 
-.string-board { fill: var(--board); }
-
-.string-rosette {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 1.4;
-  opacity: .28;
-}
-
-.string-rosette-in {
-  fill: none;
-  stroke: var(--brass);
-  stroke-width: 1;
-  opacity: .14;
-}
-
-.string-fret { stroke: var(--ink-3); stroke-width: 1.4; stroke-linecap: round; opacity: .5; }
-.string-fret.major { stroke: var(--ink-2); stroke-width: 2; opacity: .85; }
-
-.string-num {
-  fill: var(--ink-2);
-  font: 500 8.5px var(--mono);
-  text-anchor: middle;
-  letter-spacing: .04em;
-  opacity: .8;
-}
-
-.string-wire-shadow {
-  fill: none;
-  stroke: rgba(52, 40, 16, .26);
-  stroke-width: 3.4;
-  stroke-linecap: round;
-  transform: translateY(2.5px);
-}
-
-.string-wire {
-  fill: none;
-  stroke: #8d9294;
-  stroke-width: 2.6;
-  stroke-linecap: round;
-}
-
-.string-wire-gloss {
-  fill: none;
-  stroke: rgba(255, 255, 255, .78);
-  stroke-width: 0.9;
-  stroke-linecap: round;
-  transform: translateY(-0.9px);
-}
-
-.string-envelope {
-  fill: none;
-  stroke: var(--lacquer);
-  stroke-width: 1.1;
-  opacity: .28;
-}
-
-.string-nut {
-  fill: #efe8d6;
-  stroke: rgba(70, 56, 30, .3);
-  stroke-width: 1;
-  filter: drop-shadow(0 2px 3px rgba(60, 48, 24, .3));
-}
-
-.string-bridge {
-  fill: url(#marker-grad);
-  filter: drop-shadow(0 2px 3px rgba(60, 48, 24, .35));
-}
-
-.string-foot {
-  fill: rgba(60, 48, 24, .18);
-  filter: blur(3px);
-}
-.string-marker {
-  fill: url(#marker-grad);
-  stroke: var(--brass-lo);
-  stroke-width: .8;
-  filter: drop-shadow(0 2px 3px rgba(40, 30, 10, .35));
-}
-
-.string-grip { fill: transparent; }
-
-/* ============================================================
-   05 旋钮 · KNOB —— 滚花铝旋钮 + 黄铜刻度盘
-   ============================================================ */
-
-.dial {
+/* ───── 05 KNOB ───── */
+.knob {
   position: relative;
-  width: 238px;
-  height: 238px;
-  touch-action: none;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  outline: none;
   cursor: grab;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
-
-.dial:active { cursor: grabbing; }
-
-.dial-scale { position: absolute; inset: 0; overflow: visible; }
-.dial-tick { stroke: var(--rule); stroke-width: 1.6; stroke-linecap: round; }
-.dial-tick.on { stroke: var(--lacquer); }
-.dial-tick.major { stroke-width: 2.4; }
-.dial-num { fill: var(--ink-3); font: 500 8.5px var(--mono); text-anchor: middle; }
-.dial-num.on { fill: var(--lacquer); }
-
-.dial-well {
+.knob.is-drag { cursor: grabbing; }
+.knob-ticks { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.knob-tick { stroke: var(--off); stroke-width: 2.6; stroke-linecap: round; transition: stroke .15s; }
+.knob-tick.is-on { stroke: var(--tone); }
+.knob-cap {
   position: absolute;
-  inset: 26px;
+  inset: 28px;
   border-radius: 50%;
-  background: radial-gradient(74% 74% at 38% 24%, rgba(255, 253, 246, .6), rgba(255, 253, 246, 0) 76%);
-  box-shadow: inset 0 0 0 1px var(--rule-soft);
+  background: conic-gradient(from 0deg, #e9e8e4, #b9b8b2 12%, #f3f2ee 25%, #b2b1ab 37%, #efeeea 50%, #b8b7b1 62%, #f4f3ef 75%, #b5b4ae 87%, #e9e8e4);
+  box-shadow: 0 18px 30px -12px rgba(0, 0, 0, .5), 0 2px 0 rgba(255, 255, 255, .8) inset, 0 0 0 1px rgba(0, 0, 0, .1);
+  transition: transform .06s linear;
 }
-
-.dial-body {
-  position: absolute;
-  inset: 44px;
-  border-radius: 50%;
-  background:
-    conic-gradient(from 210deg, #cfc9b8, #f2ecdc 14%, #b3ac99 30%, #e8e1cf 46%, #a9a28f 60%, #ded7c4 76%, #c9c2af 90%, #cfc9b8);
-  box-shadow:
-    0 14px 24px -12px rgba(40, 32, 14, .5),
-    0 2px 4px rgba(40, 32, 14, .2),
-    inset 0 1px 0 rgba(255, 255, 255, .7);
-  will-change: transform;
-}
-
-.dial-body::before {
+.knob-cap::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 15px;
   border-radius: 50%;
-  background: repeating-conic-gradient(rgba(58, 50, 32, .19) 0 1.6deg, transparent 1.6deg 7deg);
-  -webkit-mask: radial-gradient(circle, transparent 68%, #000 69%);
-  mask: radial-gradient(circle, transparent 68%, #000 69%);
+  background: linear-gradient(160deg, #fcfbf8, #dddcd6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .18) inset, 0 1px 0 #fff;
 }
+.knob-mark { position: absolute; top: 8px; left: 50%; width: 6px; height: 18px; margin-left: -3px; border-radius: 3px; background: var(--tone); }
+.knob-value { position: absolute; inset: 0; display: grid; place-items: center; color: #1b1b1d; pointer-events: none; }
+.knob-value b { font-size: 30px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.knob-value small { margin-left: 2px; color: #77756d; font: 600 11px/1 var(--mono); }
+.knob:focus-visible .knob-cap { outline: 3px solid var(--tone); outline-offset: 5px; }
 
-.dial-face {
-  position: absolute;
-  inset: 9px;
-  border-radius: 50%;
-  background:
-    radial-gradient(78% 78% at 34% 24%, #fbf7ec, var(--bone) 52%, var(--bone-2) 100%);
-  box-shadow:
-    inset 0 2px 3px rgba(255, 255, 255, .8),
-    inset 0 -3px 7px rgba(70, 56, 30, .2),
-    0 1px 2px rgba(40, 32, 14, .18);
-}
-
-.dial-pointer {
-  position: absolute;
-  left: 50%;
-  top: 7px;
-  width: 6px;
-  height: 20px;
-  margin-left: -3px;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(180deg, var(--lacquer-hi), var(--lacquer));
-  box-shadow: 0 1px 2px rgba(40, 20, 10, .35);
-}
-
-.dial-window {
-  position: absolute;
-  inset: 38px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(72% 72% at 40% 30%, #4a4d42, #20221c 78%);
-  box-shadow:
-    inset 0 2px 6px rgba(0, 0, 0, .5),
-    0 1px 0 rgba(255, 255, 255, .5);
-}
-
-.dial-value {
-  font: 600 23px/1 var(--sans);
-  font-variant-numeric: tabular-nums;
-  color: #f6f1e2;
-  letter-spacing: .02em;
-}
-
-.dial-value small { font-size: 11px; opacity: .5; margin-left: 2px; }
-
-/* ============================================================
-   06 计数轮 · COUNTER —— 机械里程表
-   ============================================================ */
-
-.counter { display: grid; gap: 20px; justify-items: center; }
-
+/* ───── 06 COUNTER ───── */
+.counter { display: grid; justify-items: center; gap: 20px; }
 .counter-window {
-  position: relative;
   display: flex;
-  gap: 3px;
-  padding: 11px 15px;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #55594e, var(--slate));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .14),
-    0 10px 18px -10px var(--cast),
-    0 0 0 1px rgba(0, 0, 0, .25);
-  overflow: hidden;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 20px;
+  background: #0f0f12;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .7) inset, 0 1px 0 rgba(255, 255, 255, .35), 0 16px 26px -16px rgba(0, 0, 0, .55);
 }
-
-.counter-digits { display: flex; gap: 3px; }
-
-.counter-wheel {
-  position: relative;
-  width: .62em;
-  height: 1.2em;
-  overflow: hidden;
-  border-radius: 3px;
-  background: #1c1e19;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, .6);
-  font: 600 46px/1.2em var(--sans);
-  font-variant-numeric: tabular-nums;
-}
-
-.counter-strip { position: absolute; left: 0; top: 0; right: 0; will-change: transform; }
-.counter-strip span { display: block; height: 1.2em; line-height: 1.2em; text-align: center; color: #f7f2e3; }
-.counter-strip span.dim { color: rgba(247, 242, 227, .22); }
-
-.counter-wheel.is-leading { opacity: .34; }
-
-.counter-glass {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .17), rgba(255, 255, 255, 0) 34%, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, .26));
-}
-
-.counter-glass::after {
-  content: "";
-  position: absolute;
-  left: 8%;
-  top: 6%;
-  width: 22%;
-  height: 88%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .16), transparent);
-  transform: skewX(-9deg);
-}
-
+.wheel { position: relative; width: 54px; height: 72px; overflow: hidden; border-radius: 12px; background: linear-gradient(#202026, #17171c); }
+.wheel::after { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(0, 0, 0, .7), transparent 30%, transparent 70%, rgba(0, 0, 0, .7)); pointer-events: none; }
+.strip { will-change: transform; }
+.strip span { display: grid; place-items: center; height: 72px; color: #f4f3ef; font: 700 46px/1 var(--mono); font-variant-numeric: tabular-nums; }
+.wheel[data-wheel="0"] .strip span { color: var(--tone); }
 .counter-buttons { display: flex; gap: 14px; }
-
 .counter-btn {
-  width: 54px;
-  height: 54px;
+  width: 58px;
+  height: 58px;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  font: 400 24px/1 var(--sans);
+  background: var(--tile-2);
   color: var(--ink);
+  font: 500 28px/1 var(--font);
   cursor: pointer;
-  background: linear-gradient(150deg, #fbf7ec, var(--bone) 46%, var(--bone-2));
-  box-shadow:
-    0 7px 12px -7px var(--cast),
-    0 1px 0 var(--sheen),
-    inset 0 -2px 4px rgba(70, 56, 30, .16);
-  transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-shadow: 0 8px 14px -8px rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .5) inset;
+  transition: transform .25s var(--spring), background .2s;
 }
+.counter-btn.is-plus { background: var(--tone); color: #fff; }
+.counter-btn.is-down,
+.counter-btn:active { transform: scale(.88); }
 
-.counter-btn:active { transform: translateY(3px) scale(.97); box-shadow: 0 2px 4px -3px var(--cast), inset 0 -2px 4px rgba(70, 56, 30, .2); }
-
-.counter-btn.is-plus {
-  color: #fdf2e4;
-  background: linear-gradient(150deg, var(--lacquer-hi), var(--lacquer) 52%, var(--lacquer-lo));
-  box-shadow:
-    0 7px 14px -7px rgba(120, 30, 15, .6),
-    inset 0 1px 0 rgba(255, 255, 255, .3);
+/* ───── 07 JAR ───── */
+.jar-wrap { display: flex; align-items: center; gap: 22px; }
+.jar { display: block; width: 112px; height: auto; overflow: visible; outline: none; cursor: ns-resize; touch-action: none; user-select: none; -webkit-user-select: none; }
+.jar-glass { fill: color-mix(in srgb, var(--tone) 7%, transparent); }
+.jar-rim { fill: none; stroke: var(--ink); stroke-opacity: .3; stroke-width: 2.6; }
+.jar-stop-a { stop-color: var(--tone); stop-opacity: .78; }
+.jar-stop-b { stop-color: var(--tone); stop-opacity: 1; }
+.jar-liquid { fill: url(#jar-grad); }
+.jar-liquid-back { fill: var(--tone); opacity: .38; }
+.jar-bubble { fill: #fff; fill-opacity: .55; }
+.jar-shine { fill: none; stroke: #fff; stroke-opacity: .55; stroke-width: 3.4; stroke-linecap: round; }
+.jar-tick { fill: none; stroke: var(--muted); stroke-opacity: .6; stroke-width: 1.8; stroke-linecap: round; }
+.jar:focus-visible .jar-rim { stroke: var(--tone); stroke-opacity: 1; }
+.jar-side { display: grid; gap: 14px; justify-items: start; }
+.jar-buttons { display: grid; gap: 8px; }
+.mini-btn {
+  min-width: 64px;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--tile-2);
+  color: var(--ink);
+  font: 700 13px/1 var(--mono);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: transform .25s var(--spring), background .2s, color .2s;
 }
+.mini-btn:first-child { background: var(--tone); color: #fff; }
+.mini-btn:active { transform: scale(.9); }
 
-.counter-btn[disabled] { opacity: .34; cursor: default; pointer-events: none; }
-
-/* ============================================================
-   07 浸瓶 · JAR —— 玻璃标本瓶
-   ============================================================ */
-
-.jar {
-  width: 168px;
-  height: auto;
-  overflow: visible;
-  touch-action: none;
-  cursor: ns-resize;
-}
-
-.jar-glass { fill: color-mix(in srgb, var(--bone) 42%, transparent); }
-.jar-rim { fill: none; stroke: var(--ink); stroke-opacity: .55; stroke-width: 2; stroke-linejoin: round; }
-.jar-shine { stroke: #fff; stroke-opacity: .62; stroke-width: 4; stroke-linecap: round; fill: none; }
-.jar-shine-soft { stroke: #fff; stroke-opacity: .26; stroke-width: 3; stroke-linecap: round; fill: none; }
-.jar-liquid { fill: url(#liquid-grad); }
-.jar-liquid-deep { fill: url(#liquid-deep); }
-.jar-meniscus { fill: none; stroke: rgba(255, 255, 255, .5); stroke-width: 1.4; }
-.jar-bubble { fill: #fff; fill-opacity: .5; }
-.jar-cork { fill: var(--brass); }
-.jar-cork-line { stroke: var(--brass-lo); stroke-width: 1.2; fill: none; }
-.jar-label { fill: #fdfaf1; stroke: rgba(60, 50, 32, .18); stroke-width: .8; }
-.jar-label-text { fill: #3b3a30; font: 600 9px var(--mono); text-anchor: middle; letter-spacing: .04em; }
-.jar-spec { fill: #fff; fill-opacity: .85; }
-.jar-tail { stroke: #fff; stroke-opacity: .5; stroke-width: 2; stroke-linecap: round; fill: none; }
-
-/* ============================================================
-   08 键帽 · KEY —— 立体漆面键帽
-   ============================================================ */
-
+/* ───── 08 KEY (CSS 3D) ───── */
 .key-stage {
   position: relative;
   width: 100%;
-  height: 250px;
-  display: grid;
-  place-items: center;
+  max-width: 250px;
+  height: 190px;
+  perspective: 700px;
+  perspective-origin: 50% 36%;
 }
-
-.key-canvas {
+.key-scene {
+  --tx: 0;
+  --ty: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 104px;
+  height: 104px;
+  margin: -46px 0 0 -52px;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(52deg + var(--ty) * -7deg)) rotateZ(calc(-34deg + var(--tx) * 14deg));
+  transition: transform .3s ease-out;
+}
+.key-base {
+  position: absolute;
+  inset: -26px;
+  border-radius: 30px;
+  background: var(--tile-2);
+  box-shadow: 0 0 0 1px var(--line) inset, 0 24px 34px -10px rgba(0, 0, 0, .35);
+  transform: translateZ(-14px);
+}
+.key {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  touch-action: none;
+  transform-style: preserve-3d;
+  transition: transform .22s var(--spring);
 }
-
+.key::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, .3);
+  filter: blur(10px);
+  transform: translateZ(-12px);
+}
+.key.is-down { transform: translateZ(-9px); transition-duration: .07s; }
+.key-side { position: absolute; display: block; }
+.s-front { left: 0; top: 100%; width: 100%; height: 40px; transform-origin: top; transform: rotateX(90deg); background: color-mix(in srgb, var(--tone), #000 30%); }
+.s-back { left: 0; top: -40px; width: 100%; height: 40px; transform-origin: bottom; transform: rotateX(-90deg); background: color-mix(in srgb, var(--tone), #000 48%); }
+.s-left { left: -40px; top: 0; width: 40px; height: 100%; transform-origin: right; transform: rotateY(90deg); background: color-mix(in srgb, var(--tone), #000 20%); }
+.s-right { left: 100%; top: 0; width: 40px; height: 100%; transform-origin: left; transform: rotateY(-90deg); background: color-mix(in srgb, var(--tone), #000 40%); }
+.key-top {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--tone), #fff 30%), var(--tone) 58%, color-mix(in srgb, var(--tone), #000 16%));
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--tone), #fff 16%) inset, 0 -10px 16px rgba(0, 0, 0, .16) inset;
+  color: #fff;
+  transform: translateZ(40px);
+}
+.key-top b { font-size: 40px; font-weight: 800; line-height: 1; text-shadow: 0 2px 0 rgba(0, 0, 0, .18); }
 .key-hit {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 190px;
-  height: 92px;
-  margin: -46px 0 0 -95px;
+  inset: 0;
   padding: 0;
   border: 0;
-  border-radius: 46px;
-  background: none;
+  border-radius: 26px;
+  background: transparent;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
+.key-hit:focus-visible { outline: 2px solid var(--tone); outline-offset: -6px; }
+.key-count { display: flex; align-items: baseline; gap: 4px; color: var(--muted); font-size: 13px; }
+.key-count b { color: var(--ink); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
 
-.key-hit:focus-visible { outline: 2px solid var(--lacquer); outline-offset: 6px; }
-
-/* WebGL 不可用时的降级键帽 */
-.key-fallback {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 172px;
-  height: 62px;
-  margin: -31px 0 0 -86px;
-  border-radius: 31px;
-  background: linear-gradient(180deg, #7e8386, #55595b);
-  box-shadow: 0 12px 20px -10px var(--cast), inset 0 1px 0 rgba(255, 255, 255, .3);
-  display: grid;
-  place-items: center;
-  transition: opacity 240ms var(--ease-out);
+@media (prefers-reduced-motion: reduce) {
+  .key-scene { transition: none; }
+  .knob-cap { transition: none; }
 }
-
-.key-fallback i {
-  display: grid;
-  place-items: center;
-  width: 138px;
-  height: 46px;
-  border-radius: 23px;
-  background: linear-gradient(180deg, var(--lacquer-hi), var(--lacquer) 52%, var(--lacquer-lo));
-  box-shadow: 0 4px 8px -3px rgba(90, 20, 10, .6), inset 0 1px 0 rgba(255, 255, 255, .3);
-  color: #fdf1e4;
-  font: 700 15px/1 var(--serif);
-  letter-spacing: .1em;
-}
-
-.key-stage.is-live .key-fallback { opacity: 0; }

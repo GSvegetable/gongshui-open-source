@@ -1,263 +1,118 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="八个组件：八件可以上手的交互控件——压印、拨钮、钤印、弦、旋钮、计数轮、浸瓶与实体键帽。">
-<meta name="theme-color" content="#cdc6b3">
+<meta name="description" content="八个组件：八件可以上手的交互控件——压印、拨钮、钤印、弦、旋钮、计数轮、浸瓶与三维键帽。">
+<meta name="theme-color" content="#e8e6df">
 <title>八个组件 · Eight Components</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@600;700&display=swap" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="./styles/sheet.css?v=2.0.0">
-<link rel="stylesheet" href="./styles/controls.css?v=2.0.0">
+<link rel="stylesheet" href="./styles/sheet.css?v=3.0.0">
+<link rel="stylesheet" href="./styles/controls.css?v=3.0.0">
 </head>
 <body>
-
-<!-- 共享的 SVG 资源：粗糙印迹、弦与液体的渐变 -->
-<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
-  <defs>
-    <filter id="ink-rough" x="-12%" y="-12%" width="124%" height="124%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" seed="11" result="grain"/>
-      <feColorMatrix in="grain" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.6 2.5" result="mask"/>
-      <feComposite in="SourceGraphic" in2="mask" operator="in" result="ink"/>
-      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="3" result="warp"/>
-      <feDisplacementMap in="ink" in2="warp" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
-    </filter>
-
-    <linearGradient id="marker-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#e3c88e"/>
-      <stop offset=".55" stop-color="#a5813c"/>
-      <stop offset="1" stop-color="#6a5023"/>
-    </linearGradient>
-
-    <linearGradient id="liquid-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#d9b87a"/>
-      <stop offset=".5" stop-color="#b0704a"/>
-      <stop offset="1" stop-color="#5b6a4c"/>
-    </linearGradient>
-
-    <linearGradient id="liquid-deep" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#000" stop-opacity=".26"/>
-      <stop offset=".18" stop-color="#000" stop-opacity="0"/>
-    </linearGradient>
-  </defs>
-</svg>
 
 <div class="sheet">
 
   <header class="masthead">
     <div class="masthead-title">
-      <p class="eyebrow">宫水.com · 交互样本 / INTERACTION SPECIMENS</p>
+      <p class="eyebrow">宫水.com · INTERACTION STUDY</p>
       <h1>八个组件<em>EIGHT TACTILE COMPONENTS</em></h1>
-      <p class="lede">
-        八件可以上手的控件，摆在一张纸上。同一盏灯从左上方照下来，同一条弹性曲线，
-        同一批材质——陶瓷、黄铜、漆面、玻璃。你可以用鼠标、可以用手指，也可以只用键盘。
-      </p>
+      <p class="lede">八件可以上手把玩的小控件。同一套圆角、同一条弹性曲线，每一件只负责把一个动作做得有手感：按住、拨动、勾选、拨弦、旋转、计数、注液、按键。</p>
     </div>
-    <div class="masthead-aside">
-      <dl class="spec-list">
-        <div><dt>图版</dt><dd>PLATE 01—08</dd></div>
-        <div><dt>灯光</dt><dd>暖光 4200K</dd></div>
-        <div><dt>材质</dt><dd>陶瓷 / 黄铜 / 漆面 / 玻璃</dd></div>
-      </dl>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="切换明暗主题">
-        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
-        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11Z"/></svg>
-        <span id="theme-label">LIGHT</span>
-      </button>
-    </div>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="切换明暗主题">
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11Z"/></svg>
+      <span id="theme-label">LIGHT</span>
+    </button>
   </header>
-
-  <nav aria-label="图版目录">
-    <ul class="toc">
-      <li><a href="#p-hold"><i>01</i><span>压印</span></a></li>
-      <li><a href="#p-toggle"><i>02</i><span>拨钮</span></a></li>
-      <li><a href="#p-stamp"><i>03</i><span>钤印</span></a></li>
-      <li><a href="#p-string"><i>04</i><span>弦</span></a></li>
-      <li><a href="#p-knob"><i>05</i><span>旋钮</span></a></li>
-      <li><a href="#p-counter"><i>06</i><span>计数轮</span></a></li>
-      <li><a href="#p-jar"><i>07</i><span>浸瓶</span></a></li>
-      <li><a href="#p-key"><i>08</i><span>键帽</span></a></li>
-    </ul>
-  </nav>
 
   <main class="plates">
 
-    <!-- ============ 01 压印 ============ -->
-    <figure class="plate" id="p-hold">
-      <span class="plate-index">01</span>
-      <div class="plate-object">
-        <div class="object">
-          <button class="plunger" id="hold" type="button" aria-label="按住 0.9 秒确认删除">
-            <span class="plunger-disc" aria-hidden="true"></span>
-            <svg class="plunger-ring" viewBox="0 0 138 138" aria-hidden="true" focusable="false">
-              <circle class="groove-light" cx="69" cy="68.2" r="58"/>
-              <circle class="track" cx="69" cy="69" r="58"/>
-              <circle class="progress" cx="69" cy="69" r="58" pathLength="100"/>
-              <g class="wet"><circle cx="69" cy="11" r="4.6"/></g>
-            </svg>
-            <span class="plunger-face" aria-hidden="true">按住<small>确认</small></span>
-            <span class="plunger-seal" aria-hidden="true">✓</span>
-          </button>
-        </div>
+    <!-- 01 压印 -->
+    <figure class="plate" id="p-hold" data-tone="orange">
+      <figcaption class="plate-head"><span class="plate-index">01</span><h2>压印<small>HOLD</small></h2></figcaption>
+      <div class="plate-stage">
+        <button class="hold" id="hold" type="button" aria-label="按住 0.9 秒确认">
+          <svg class="hold-ring" viewBox="0 0 140 140" aria-hidden="true" focusable="false">
+            <circle class="hold-track" cx="70" cy="70" r="62"/>
+            <circle class="hold-prog" cx="70" cy="70" r="62" pathLength="100"/>
+          </svg>
+          <span class="hold-core" aria-hidden="true">
+            <span class="hold-label">按住</span>
+            <svg class="hold-check" viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </span>
+        </button>
       </div>
-      <figcaption class="plate-cap">
-        <h2>压印 <small>HOLD</small></h2>
-        <p>陶瓷圆片嵌在纸面里，按住时内圈被红漆一寸寸填满；松手会退回去，填满就落下一枚蜡封。</p>
-        <p class="hint">按住 0.9 秒 · 中途松手回弹 · 键盘按住空格</p>
-      </figcaption>
+      <p class="plate-hint">按住 0.9 秒确认 · 中途松手会退回</p>
     </figure>
 
-    <!-- ============ 02 拨钮 ============ -->
-    <figure class="plate" id="p-toggle">
-      <span class="plate-index">02</span>
-      <div class="plate-object">
-        <div class="object toggle-list">
-          <div class="toggle-row">
-            <span class="toggle-name">勿扰模式</span>
-            <button class="toggle" id="tog-1" role="switch" aria-checked="true" aria-label="勿扰模式" data-toggle>
-              <span class="toggle-bed" aria-hidden="true"></span>
-              <svg class="toggle-svg" viewBox="0 0 118 58" aria-hidden="true" focusable="false">
-                <path class="toggle-cord-shadow" d=""/>
-                <path class="toggle-cord" d=""/>
-                <circle class="toggle-post" cx="12" cy="29" r="3.6"/>
-              </svg>
-              <span class="toggle-text off" aria-hidden="true">关</span>
-              <span class="toggle-text on" aria-hidden="true">开</span>
-              <span class="toggle-thumb" aria-hidden="true"></span>
-            </button>
-          </div>
-          <div class="toggle-row">
-            <span class="toggle-name">夜间护眼</span>
-            <button class="toggle" id="tog-2" role="switch" aria-checked="false" aria-label="夜间护眼" data-toggle>
-              <span class="toggle-bed" aria-hidden="true"></span>
-              <svg class="toggle-svg" viewBox="0 0 118 58" aria-hidden="true" focusable="false">
-                <path class="toggle-cord-shadow" d=""/>
-                <path class="toggle-cord" d=""/>
-                <circle class="toggle-post" cx="12" cy="29" r="3.6"/>
-              </svg>
-              <span class="toggle-text off" aria-hidden="true">关</span>
-              <span class="toggle-text on" aria-hidden="true">开</span>
-              <span class="toggle-thumb" aria-hidden="true"></span>
-            </button>
-          </div>
+    <!-- 02 拨钮 -->
+    <figure class="plate" id="p-toggle" data-tone="green">
+      <figcaption class="plate-head"><span class="plate-index">02</span><h2>拨钮<small>SWITCH</small></h2></figcaption>
+      <div class="plate-stage">
+        <div class="switch-list">
+          <div class="switch-row"><span class="switch-name">勿扰模式</span><button class="switch" type="button" role="switch" aria-checked="true" aria-label="勿扰模式" data-switch><span class="switch-thumb"></span></button></div>
+          <div class="switch-row"><span class="switch-name">夜间护眼</span><button class="switch" type="button" role="switch" aria-checked="false" aria-label="夜间护眼" data-switch><span class="switch-thumb"></span></button></div>
+          <div class="switch-row"><span class="switch-name">触感反馈</span><button class="switch" type="button" role="switch" aria-checked="true" aria-label="触感反馈" data-switch><span class="switch-thumb"></span></button></div>
         </div>
       </div>
-      <figcaption class="plate-cap">
-        <h2>拨钮 <small>TOGGLE</small></h2>
-        <p>拇指压着一根红皮筋推过去。皮筋越拉越直，越过卡位会被拽回来，来回晃两下才停。</p>
-        <p class="hint">点击或左右拖动 · 回弹有阻尼</p>
-      </figcaption>
+      <p class="plate-hint">点击，或者拖着拨过去 · 回弹有弹性</p>
     </figure>
 
-    <!-- ============ 03 钤印 ============ -->
-    <figure class="plate" id="p-stamp">
-      <span class="plate-index">03</span>
-      <div class="plate-object">
-        <div class="object ledger">
-          <label class="ledger-row">
-            <input type="checkbox">
-            <span class="ledger-text">回复三封邮件</span>
-            <span class="ledger-box" aria-hidden="true"></span>
-            <span class="ledger-ink" aria-hidden="true"></span>
-            <span class="ledger-stamp" aria-hidden="true"><b>済</b></span>
-          </label>
-          <label class="ledger-row">
-            <input type="checkbox">
-            <span class="ledger-text">把标本归档</span>
-            <span class="ledger-box" aria-hidden="true"></span>
-            <span class="ledger-ink" aria-hidden="true"></span>
-            <span class="ledger-stamp" aria-hidden="true"><b>済</b></span>
-          </label>
-          <label class="ledger-row">
-            <input type="checkbox">
-            <span class="ledger-text">给彗星拍张照</span>
-            <span class="ledger-box" aria-hidden="true"></span>
-            <span class="ledger-ink" aria-hidden="true"></span>
-            <span class="ledger-stamp" aria-hidden="true"><b>済</b></span>
-          </label>
+    <!-- 03 钤印 -->
+    <figure class="plate" id="p-stamp" data-tone="blue">
+      <figcaption class="plate-head"><span class="plate-index">03</span><h2>钤印<small>CHECK</small></h2></figcaption>
+      <div class="plate-stage">
+        <div class="tasks">
+          <label class="task"><input type="checkbox"><span class="task-box" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="task-text">回复三封邮件</span></label>
+          <label class="task"><input type="checkbox" checked><span class="task-box" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="task-text">把标本归档</span></label>
+          <label class="task"><input type="checkbox"><span class="task-box" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="task-text">给彗星拍张照</span></label>
         </div>
       </div>
-      <figcaption class="plate-cap">
-        <h2>钤印 <small>STAMP</small></h2>
-        <p>勾一行，就有一枚印从上方落下来，压得纸面凹一点，边缘还带着没吃匀的墨。</p>
-        <p class="hint">逐行勾选 · 印迹边缘不规则</p>
-      </figcaption>
+      <p class="plate-hint">逐行勾选 · 落印、画线、涟漪一起发生</p>
     </figure>
 
-    <!-- ============ 04 弦 ============ -->
-    <figure class="plate" id="p-string">
-      <span class="plate-index">04</span>
-      <div class="plate-object plate-object--stack">
-        <div class="object string-object">
-          <div class="readout"><span id="string-readout">40</span><small>N</small></div>
-          <svg class="string" id="string" viewBox="0 0 340 140" tabindex="0" role="slider"
-               aria-label="张力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40">
-            <circle class="string-rosette" cx="170" cy="46" r="26"/>
-            <circle class="string-rosette-in" cx="170" cy="46" r="18"/>
-            <g id="string-frets"></g>
-            <ellipse class="string-foot" cx="26" cy="62" rx="12" ry="3.4"/>
-            <ellipse class="string-foot" cx="309" cy="62" rx="9" ry="3"/>
-            <rect class="string-nut" x="22" y="36" width="8" height="22" rx="2"/>
-            <path class="string-bridge" d="M305 34h8l-2 24h-4z"/>
-            <path class="string-wire-shadow" id="wire-shadow" d=""/>
-            <path class="string-envelope" id="wire-envelope" d=""/>
-            <path class="string-wire" id="wire" d=""/>
-            <path class="string-wire-gloss" id="wire-gloss" d=""/>
-            <g class="string-marker" id="string-marker">
-              <path d="M-9 -28 L9 -28 L6 -8 L-6 -8 Z"/>
-            </g>
-            <rect class="string-grip" x="22" y="26" width="292" height="40"/>
+    <!-- 04 弦 -->
+    <figure class="plate" id="p-string" data-tone="pink">
+      <figcaption class="plate-head"><span class="plate-index">04</span><h2>弦<small>STRING</small></h2></figcaption>
+      <div class="plate-stage">
+        <div class="string-wrap">
+          <div class="readout"><span id="string-value">40</span><small>N</small></div>
+          <svg class="string" id="string" viewBox="0 0 320 120" tabindex="0" role="slider" aria-label="张力" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40">
+            <g id="string-ticks"></g>
+            <circle class="string-post" cx="16" cy="60" r="5"/>
+            <circle class="string-post" cx="304" cy="60" r="5"/>
+            <path class="string-ghost" id="string-ghost" d="M16 60L170 60L304 60"/>
+            <path class="string-line" id="string-line" d="M16 60L170 60L304 60"/>
+            <circle class="string-bead" id="string-bead" cx="170" cy="60" r="11"/>
           </svg>
         </div>
       </div>
-      <figcaption class="plate-cap">
-        <h2>弦 <small>STRING</small></h2>
-        <p>一根钢弦横在纸面上，拨它就按泛音列振起来，越往后越快。拖动铜制品位尺改变张力。</p>
-        <p class="hint">拖动或用方向键 · 松手后弦自行衰减</p>
-      </figcaption>
+      <p class="plate-hint">左右拖动改变张力 · 上下拉开再松手，弦会振起来</p>
     </figure>
 
-    <!-- ============ 05 旋钮 ============ -->
-    <figure class="plate" id="p-knob">
-      <span class="plate-index">05</span>
-      <div class="plate-object">
-        <div class="object">
-          <div class="dial" id="dial" role="slider" tabindex="0" aria-label="音量"
-               aria-valuemin="0" aria-valuemax="100" aria-valuenow="40">
-            <svg class="dial-scale" viewBox="0 0 238 238" aria-hidden="true" focusable="false">
-              <g id="dial-ticks"></g>
-            </svg>
-            <div class="dial-well" aria-hidden="true"></div>
-            <div class="dial-body" id="dial-body" aria-hidden="true">
-              <div class="dial-face">
-                <i class="dial-pointer"></i>
-                <div class="dial-window"><span class="dial-value"><span id="dial-value">40</span><small>%</small></span></div>
-              </div>
-            </div>
-          </div>
+    <!-- 05 旋钮 -->
+    <figure class="plate" id="p-knob" data-tone="violet">
+      <figcaption class="plate-head"><span class="plate-index">05</span><h2>旋钮<small>KNOB</small></h2></figcaption>
+      <div class="plate-stage">
+        <div class="knob" id="knob" role="slider" tabindex="0" aria-label="音量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40">
+          <svg class="knob-ticks" viewBox="0 0 200 200" aria-hidden="true" focusable="false"><g id="knob-ticks"></g></svg>
+          <div class="knob-cap" id="knob-cap" aria-hidden="true"><i class="knob-mark"></i></div>
+          <div class="knob-value" aria-hidden="true"><span><b id="knob-value">40</b><small>%</small></span></div>
         </div>
       </div>
-      <figcaption class="plate-cap">
-        <h2>旋钮 <small>KNOB</small></h2>
-        <p>滚花铝旋钮坐在一圈刻度里，刻度会随数值一格格点亮，中间的窗里露出当前读数。</p>
-        <p class="hint">绕圈拖动 · 方向键微调 · Home / End 到两端</p>
-      </figcaption>
+      <p class="plate-hint">绕圈拖动 · 方向键微调 · Shift 加大步长</p>
     </figure>
 
-    <!-- ============ 06 计数轮 ============ -->
-    <figure class="plate" id="p-counter">
-      <span class="plate-index">06</span>
-      <div class="plate-object">
-        <div class="object counter">
+    <!-- 06 计数轮 -->
+    <figure class="plate" id="p-counter" data-tone="amber">
+      <figcaption class="plate-head"><span class="plate-index">06</span><h2>计数轮<small>COUNTER</small></h2></figcaption>
+      <div class="plate-stage">
+        <div class="counter">
           <div class="counter-window" id="counter-window" role="img" aria-label="计数 128">
-            <div class="counter-digits">
-              <div class="counter-wheel" data-wheel="2"><div class="counter-strip"></div></div>
-              <div class="counter-wheel" data-wheel="1"><div class="counter-strip"></div></div>
-              <div class="counter-wheel" data-wheel="0"><div class="counter-strip"></div></div>
-            </div>
-            <div class="counter-glass" aria-hidden="true"></div>
+            <div class="wheel" data-wheel="2"><div class="strip"></div></div>
+            <div class="wheel" data-wheel="1"><div class="strip"></div></div>
+            <div class="wheel" data-wheel="0"><div class="strip"></div></div>
           </div>
           <div class="counter-buttons">
             <button class="counter-btn" id="count-down" type="button" aria-label="减少">−</button>
@@ -265,77 +120,58 @@
           </div>
         </div>
       </div>
-      <figcaption class="plate-cap">
-        <h2>计数轮 <small>COUNTER</small></h2>
-        <p>玻璃后面是三只真实的机械数字轮：个位转得最快，十位借着它带动，百位再借着十位。</p>
-        <p class="hint">按住加减会越转越快 · 满 999 自动停</p>
-      </figcaption>
+      <p class="plate-hint">三只机械数字轮，逢九进位 · 按住加减越转越快</p>
     </figure>
 
-    <!-- ============ 07 浸瓶 ============ -->
-    <figure class="plate" id="p-jar">
-      <span class="plate-index">07</span>
-      <div class="plate-object">
-        <div class="object jar-object">
-          <svg class="jar" id="jar" viewBox="0 0 168 230" tabindex="0" role="slider"
-               aria-label="液位" aria-valuemin="0" aria-valuemax="100" aria-valuenow="62">
+    <!-- 07 浸瓶 -->
+    <figure class="plate" id="p-jar" data-tone="cyan">
+      <figcaption class="plate-head"><span class="plate-index">07</span><h2>浸瓶<small>JAR</small></h2></figcaption>
+      <div class="plate-stage">
+        <div class="jar-wrap">
+          <svg class="jar" id="jar" viewBox="0 0 110 150" tabindex="0" role="slider" aria-label="液位" aria-valuemin="0" aria-valuemax="100" aria-valuenow="62">
             <defs>
-              <clipPath id="jar-clip">
-                <path d="M64 28h40v16c0 9 15 13 21 30 3 7 3 14 3 21v93c0 13-10 21-23 21H63c-13 0-23-8-23-21V95c0-7 0-14 3-21 6-17 21-21 21-30Z"/>
-              </clipPath>
+              <clipPath id="jar-clip"><path d="M20 8H80a8 8 0 0 1 8 8V118a22 22 0 0 1-22 22H34a22 22 0 0 1-22-22V16a8 8 0 0 1 8-8Z"/></clipPath>
+              <linearGradient id="jar-grad" x1="0" y1="0" x2="0" y2="1"><stop class="jar-stop-a" offset="0"/><stop class="jar-stop-b" offset="1"/></linearGradient>
             </defs>
-            <rect class="jar-cork" x="54" y="4" width="60" height="20" rx="4"/>
-            <path class="jar-cork-line" d="M60 9h48M60 15h48M60 20h48"/>
-            <path class="jar-glass" d="M60 24h48v18c0 8 16 12 22 28 4 8 4 16 4 24v94c0 16-12 26-28 26H62c-16 0-28-10-28-26V94c0-8 0-16 4-24 6-16 22-20 22-28Z"/>
+            <path class="jar-glass" d="M20 8H80a8 8 0 0 1 8 8V118a22 22 0 0 1-22 22H34a22 22 0 0 1-22-22V16a8 8 0 0 1 8-8Z"/>
             <g clip-path="url(#jar-clip)">
+              <path class="jar-liquid-back" id="jar-liquid-back" d=""/>
               <path class="jar-liquid" id="jar-liquid" d=""/>
-              <path class="jar-liquid-deep" id="jar-liquid-deep" d=""/>
-              <path class="jar-meniscus" id="jar-meniscus" d=""/>
               <g id="jar-bubbles"></g>
-              <g id="jar-spec">
-                <path class="jar-tail" d="M-14 6 Q-6 2 2 -3"/>
-                <circle class="jar-spec" cx="4" cy="-5" r="4.4"/>
-              </g>
             </g>
-            <path class="jar-shine" d="M46 84v72"/>
-            <path class="jar-shine-soft" d="M126 96v26"/>
-            <g id="jar-label-group" transform="rotate(-3 84 188)">
-              <rect x="48" y="174" width="72" height="28" rx="2" class="jar-label"/>
-              <text class="jar-label-text" x="84" y="192">No.07 彗星</text>
-            </g>
-            <path class="jar-rim" d="M60 24h48v18c0 8 16 12 22 28 4 8 4 16 4 24v94c0 16-12 26-28 26H62c-16 0-28-10-28-26V94c0-8 0-16 4-24 6-16 22-20 22-28Z"/>
+            <path class="jar-shine" d="M24 30V92"/>
+            <path class="jar-rim" d="M20 8H80a8 8 0 0 1 8 8V118a22 22 0 0 1-22 22H34a22 22 0 0 1-22-22V16a8 8 0 0 1 8-8Z"/>
+            <path class="jar-tick" d="M94 140h8M94 108.5h5M94 77h8M94 45.5h5M94 14h8"/>
           </svg>
           <div class="jar-side">
             <div class="readout"><span id="jar-readout">62</span><small>%</small></div>
             <div class="jar-buttons">
-              <button class="mini-btn" id="jar-down" type="button" aria-label="液位降低 10">−10</button>
               <button class="mini-btn" id="jar-up" type="button" aria-label="液位升高 10">+10</button>
+              <button class="mini-btn" id="jar-down" type="button" aria-label="液位降低 10">−10</button>
             </div>
           </div>
         </div>
       </div>
-      <figcaption class="plate-cap">
-        <h2>浸瓶 <small>JAR</small></h2>
-        <p>玻璃瓶里泡着一枚彗星。上下拖动瓶身改变液面，液体会跟着晃，气泡一直往上冒。</p>
-        <p class="hint">上下拖动 · 方向键微调 · −10 / +10</p>
-      </figcaption>
+      <p class="plate-hint">上下拖动瓶身改变液面 · 液体会晃，气泡一直往上冒</p>
     </figure>
 
-    <!-- ============ 08 键帽 ============ -->
-    <figure class="plate" id="p-key">
-      <span class="plate-index">08</span>
-      <div class="plate-object">
-        <div class="object key-stage" id="key-stage">
-          <div class="key-canvas" id="key-canvas"></div>
-          <div class="key-fallback" aria-hidden="true"><i>按</i></div>
+    <!-- 08 键帽 -->
+    <figure class="plate" id="p-key" data-tone="red">
+      <figcaption class="plate-head"><span class="plate-index">08</span><h2>键帽<small>KEY</small></h2></figcaption>
+      <div class="plate-stage">
+        <div class="key-stage" id="key-stage">
+          <div class="key-scene" id="key-scene">
+            <div class="key-base"></div>
+            <div class="key" id="key-cap">
+              <i class="key-side s-front"></i><i class="key-side s-back"></i><i class="key-side s-left"></i><i class="key-side s-right"></i>
+              <span class="key-top"><b>按</b></span>
+            </div>
+          </div>
           <button class="key-hit" id="key-hit" type="button" aria-label="实体按键，按下"></button>
         </div>
+        <div class="key-count"><b id="key-count">0</b><small>次</small></div>
       </div>
-      <figcaption class="plate-cap">
-        <h2>键帽 <small>KEY</small></h2>
-        <p>这一件是真的三维：镍质底圈上一块朱漆键帽，影棚柔光在漆面上滑过，按下去有回弹。</p>
-        <p class="hint">按住或用空格 / 回车 · 移动指针会带动倾角</p>
-      </figcaption>
+      <p class="plate-hint">真三维 · 移动指针带动倾角，按下整块下沉</p>
     </figure>
 
   </main>
@@ -348,12 +184,12 @@
 
 <noscript>
   <p style="max-width:640px;margin:0 auto;padding:0 26px 40px;color:#5f6154;font:13px/1.7 system-ui,sans-serif">
-    这八件组件都需要 JavaScript 才能交互。页面文字与图版说明仍然可读。
+    这八件组件都需要 JavaScript 才能交互。页面文字仍然可读。
   </p>
 </noscript>
 
-<script src="./scripts/core.js?v=2.0.0"></script>
-<script src="./scripts/controls.js?v=2.0.0"></script>
-<script src="./scripts/press-key.js?v=2.0.0"></script>
+<script src="./scripts/core.js?v=3.0.0"></script>
+<script src="./scripts/controls.js?v=3.0.0"></script>
+<script src="./scripts/press-key.js?v=3.0.0"></script>
 </body>
 </html>
