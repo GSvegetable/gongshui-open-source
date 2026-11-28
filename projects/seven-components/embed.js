@@ -23,6 +23,10 @@
   slot.style.minHeight = slot.hasAttribute('data-embed-fill') ? '0' : '300px';
   slot.style.overflow = 'hidden';
   const frame = document.createElement('iframe');
+  let resolveReady;
+  const ready = new Promise(resolve => { resolveReady = resolve; });
+  const onFrameLoad = () => resolveReady(true);
+  frame.addEventListener('load', onFrameLoad, {once:true});
   const url = new URL('index.html', base);
   url.searchParams.set('embed','1');
   url.searchParams.set('v',script.getAttribute('data-version') || '1.0.0');
@@ -35,8 +39,8 @@
   slot.replaceChildren(frame);
   const api = {
     element:slot, iframe:frame,
-    ready:new Promise(resolve => frame.addEventListener('load',()=>resolve(true),{once:true})),
-    destroy(){frame.remove();if(owns)slot.remove();else{slot.replaceChildren(...oldChildren);if(oldStyle===null)slot.removeAttribute('style');else slot.setAttribute('style',oldStyle);slot.removeAttribute('data-gongshui-embed')}delete slot.gongshuiEmbed}
+    ready,
+    destroy(){frame.removeEventListener('load', onFrameLoad);resolveReady(false);if(owns)slot.remove();else{slot.replaceChildren(...oldChildren);if(oldStyle===null)slot.removeAttribute('style');else slot.setAttribute('style',oldStyle);slot.removeAttribute('data-gongshui-embed')}delete slot.gongshuiEmbed}
   };
   slot.gongshuiEmbed=api;
   window.dispatchEvent(new CustomEvent('gongshui:embed:ready',{detail:{kind:'seven-components',element:slot,iframe:frame,api}}));
