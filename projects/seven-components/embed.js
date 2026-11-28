@@ -29,7 +29,7 @@
   frame.addEventListener('load', onFrameLoad, {once:true});
   const url = new URL('index.html', base);
   url.searchParams.set('embed','1');
-  url.searchParams.set('v',script.getAttribute('data-version') || '1.0.1');
+  url.searchParams.set('v',script.getAttribute('data-version') || '1.0.2');
   frame.src = url.href;
   frame.title = script.getAttribute('data-label') || '七个组件 · Seven Components';
   frame.loading = script.getAttribute('data-loading') || 'lazy';
